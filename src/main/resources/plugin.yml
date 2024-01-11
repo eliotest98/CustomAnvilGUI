@@ -1,0 +1,26 @@
+name: AnvilPlus
+version: maven-version-number
+main: io.eliotesta98.AnvilPlus.Core.Main
+api-version: 1.13
+authors: [eliotesta98, xSavior_of_God]
+softdepend: []
+
+libraries:
+  - com.googlecode.json-simple:json-simple:1.1.1
+  - com.h2database:h2:2.1.212
+
+legacy-libraries:
+  - com.googlecode.json-simple:json-simple:1.1.1
+  - com.h2database:h2:2.1.212
+
+depend: []
+commands:
+  labyrinth:
+    aliases: [ap,anvilp]
+permissions:
+  anvilplus.help.command:
+    description: /anvilplus <help>
+    default: op
+  anvilplus.reload.command:
+    description: /anvilplus <reload>
+    default: op
