@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>AnvilPlus</groupId>
-	<artifactId>AnvilPlus</artifactId>
+	<groupId>CustomGuiForAnvil</groupId>
+	<artifactId>CustomGuiForAnvil</artifactId>
 	<version>1.0</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -12,7 +12,7 @@
 	</properties>
 
 	<build>
-		<finalName>Labyrinth ${project.version}</finalName>
+		<finalName>CustomGuiForAnvil ${project.version}</finalName>
 		<defaultGoal>clean package</defaultGoal>
 		<sourceDirectory>${basedir}/src/main/java</sourceDirectory>
 		<resources>
@@ -75,19 +75,19 @@
 							<relocations>
 								<relocation>
 									<pattern>org.slf4j</pattern>
-									<shadedPattern>com.heroxplugins.external.AnvilPlus.org.slf4j</shadedPattern>
+									<shadedPattern>com.heroxplugins.external.CustomGuiForAnvil.org.slf4j</shadedPattern>
 								</relocation>
 								<relocation>
 									<pattern>com.zaxxer</pattern>
-									<shadedPattern>com.heroxplugins.external.AnvilPlus.com.zaxxer</shadedPattern>
+									<shadedPattern>com.heroxplugins.external.CustomGuiForAnvil.com.zaxxer</shadedPattern>
 								</relocation>
 								<relocation>
 									<pattern>de.tr7zw</pattern>
-									<shadedPattern>com.heroxplugins.external.AnvilPlus.de.tr7zw</shadedPattern>
+									<shadedPattern>com.heroxplugins.external.CustomGuiForAnvil.de.tr7zw</shadedPattern>
 								</relocation>
 								<relocation>
 									<pattern>org.h2</pattern>
-									<shadedPattern>com.heroxplugins.external.AnvilPlus.org.h2</shadedPattern>
+									<shadedPattern>com.heroxplugins.external.CustomGuiForAnvil.org.h2</shadedPattern>
 								</relocation>
 							</relocations>
 						</configuration>
@@ -121,36 +121,58 @@
 		</plugins>
 	</build>
 	<repositories>
-		<!-- Maven -->
-		<repository>
-			<id>www.seasar.org</id>
-			<url>https://www.seasar.org/maven/maven2/</url>
-		</repository>
 		<!-- Spigot -->
 		<repository>
 		  <id>spigot-public</id>
 		  <url>https://hub.spigotmc.org/nexus/content/repositories/public/
 		  </url>
 		</repository>
-		<!-- WorldEdit -->
+		<!-- NBT -->
 		<repository>
-			<id>enginehub-maven</id>
-			<url>https://maven.enginehub.org/repo/</url>
+			<id>codemc-repo</id>
+			<url>https://repo.codemc.org/repository/maven-public/</url>
+			<layout>default</layout>
+		</repository>
+		<!-- GameProfile -->
+		<repository>
+			<id>minecraft-repo</id>
+			<url>https://libraries.minecraft.net/</url>
 		</repository>
 	</repositories>
 	<dependencies>
-		<!-- h2 -->
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<version>2.1.212</version>
-			<scope>compile</scope>
-		</dependency>
 		<!-- Spigot -->
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
 			<version>1.20.4-R0.1-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+		<!-- NBT -->
+		<dependency>
+			<groupId>de.tr7zw</groupId>
+			<artifactId>item-nbt-api-plugin</artifactId>
+			<version>2.12.2</version>
+			<scope>compile</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.spigotmc</groupId>
+					<artifactId>spigot-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>de.tr7zw.spigotmc.maven</groupId>
+					<artifactId>tr-spigotmc-maven-plugin</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.mojang</groupId>
+					<artifactId>authlib</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- GameProfile -->
+		<dependency>
+			<groupId>com.mojang</groupId>
+			<artifactId>authlib</artifactId>
+			<version>1.5.26</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>

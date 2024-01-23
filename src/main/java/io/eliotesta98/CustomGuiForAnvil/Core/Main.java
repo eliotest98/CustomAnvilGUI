@@ -1,10 +1,14 @@
-package io.eliotesta98.AnvilPlus.Core;
+package io.eliotesta98.CustomGuiForAnvil.Core;
 
-import io.eliotesta98.AnvilPlus.Commands.Commands;
-import io.eliotesta98.AnvilPlus.Database.ConfigGestion;
-import io.eliotesta98.AnvilPlus.Utils.CommentedConfiguration;
-import io.eliotesta98.AnvilPlus.Utils.DebugUtils;
-import io.eliotesta98.AnvilPlus.Utils.Library;
+import io.eliotesta98.CustomGuiForAnvil.Commands.Commands;
+import io.eliotesta98.CustomGuiForAnvil.Database.ConfigGestion;
+import io.eliotesta98.CustomGuiForAnvil.Events.AnvilEvents;
+import io.eliotesta98.CustomGuiForAnvil.Events.CustomPrepareAnvilListener;
+import io.eliotesta98.CustomGuiForAnvil.Interfaces.GuiEvent;
+import io.eliotesta98.CustomGuiForAnvil.Utils.CommentedConfiguration;
+import io.eliotesta98.CustomGuiForAnvil.Utils.DebugUtils;
+import io.eliotesta98.CustomGuiForAnvil.Utils.Library;
+import io.eliotesta98.CustomGuiForAnvil.Utils.SoundManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -17,6 +21,7 @@ import java.util.List;
 public class Main extends JavaPlugin {
 
     public static Main instance;
+    public SoundManager SoundManager;
     private ConfigGestion config;
 
     @Override
@@ -24,7 +29,7 @@ public class Main extends JavaPlugin {
         instance = this;
 
         // Load libraries where Spigot does not do this automatically
-        loadLibraries();
+        //loadLibraries();
     }
 
     public void onEnable() {
@@ -33,14 +38,17 @@ public class Main extends JavaPlugin {
         int bStatsId = 17780;
 
         getServer().getConsoleSender()
-                .sendMessage("§a  \r\n \r\n" + " __     __   ___  _  _  ___   __  _  _  ____  _  _ \r\n"
-                        + "(  )   (  ) (  ,)( \\/ )(  ,) (  )( \\( )(_  _)( )( )\r\n"
-                        + " )(__  /__\\  ) ,\\ \\  /  )  \\  )(  )  (   )(   )__( \r\n"
-                        + "(____)(_)(_)(___/(__/  (_)\\_)(__)(_)\\_) (__) (_)(_)\r\n" + "§a  \r\n" + "§a  \r\n"
+                .sendMessage("\n\r\n\r §a______  _______  _______  _______ \n" +
+                        "§a|      ||     __||    ___||   _   |\n" +
+                        "§a|   ---||    |  ||    ___||       |\n" +
+                        "§a|______||_______||___|    |___|___|\n" +
+                        "                                   \n"
                         + "§e  Version " + getDescription().getVersion() + " \r\n"
                         + "§e© Developed by §feliotesta98 & xSavior_of_God §ewith §4<3 \r\n \r\n \r\n");
 
         this.getServer().getConsoleSender().sendMessage("§6Loading config...");
+
+        this.SoundManager = new SoundManager();
 
         File configFile = new File(this.getDataFolder(), "config.yml");
 
@@ -106,7 +114,7 @@ public class Main extends JavaPlugin {
             if (Bukkit.getServer().getPluginManager().isPluginEnabled("EcoEnchants")) {
                 if (getConfigGestion().getHooks().get("EcoEnchants")) {
                     Bukkit.getServer().getConsoleSender()
-                            .sendMessage("§e[AnvilPlus] §7Added compatibility with EcoEnchants.");
+                            .sendMessage("§e[CustomGuiForAnvil] §7Added compatibility with EcoEnchants.");
                 }
             } else {
                 getConfigGestion().getHooks().replace("EcoEnchants", false);
@@ -114,14 +122,17 @@ public class Main extends JavaPlugin {
             if (Bukkit.getServer().getPluginManager().isPluginEnabled("AdvancedEnchantments")) {
                 if (getConfigGestion().getHooks().get("AdvancedEnchantments")) {
                     Bukkit.getServer().getConsoleSender()
-                            .sendMessage("§e[AnvilPlus] §7Added compatibility with AdvancedEnchantments.");
+                            .sendMessage("§e[CustomGuiForAnvil] §7Added compatibility with AdvancedEnchantments.");
                 }
             } else {
                 getConfigGestion().getHooks().replace("AdvancedEnchantments", false);
             }
         });
 
-        getCommand("anvilplus").setExecutor(new Commands());
+        Bukkit.getServer().getPluginManager().registerEvents(new AnvilEvents(), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new CustomPrepareAnvilListener(), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new GuiEvent(), this);
+        getCommand("cgfa").setExecutor(new Commands());
 
         if (config.getDebug().get("Enabled")) {
             debugsistem.addLine("Enabled execution time= " + (System.currentTimeMillis() - tempo));
@@ -132,7 +143,7 @@ public class Main extends JavaPlugin {
     public void onDisable() {
         DebugUtils debugsistem = new DebugUtils();
         long tempo = System.currentTimeMillis();
-        Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "AnvilPlus has been disabled, §cBye bye! §e:(");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "CustomGuiForAnvil has been disabled, §cBye bye! §e:(");
         if (config.getDebug().get("Disabled")) {
             debugsistem.addLine("Disabled execution time= " + (System.currentTimeMillis() - tempo));
             debugsistem.debug("Disabled");

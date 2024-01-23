@@ -1,6 +1,6 @@
-name: AnvilPlus
+name: CustomGuiForAnvil
 version: maven-version-number
-main: io.eliotesta98.AnvilPlus.Core.Main
+main: io.eliotesta98.CustomGuiForAnvil.Core.Main
 api-version: 1.13
 authors: [eliotesta98, xSavior_of_God]
 softdepend: []
@@ -15,12 +15,12 @@ legacy-libraries:
 
 depend: []
 commands:
-  labyrinth:
-    aliases: [ap,anvilp]
+  cgfa:
+    aliases: [customguiforanvil]
 permissions:
-  anvilplus.help.command:
-    description: /anvilplus <help>
+  cgfa.command.help:
+    description: /cgfa <help>
     default: op
-  anvilplus.reload.command:
-    description: /anvilplus <reload>
+  cgfa.command.reload:
+    description: /cgfa <reload>
     default: op

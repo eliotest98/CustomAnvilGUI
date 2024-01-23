@@ -1,9 +1,9 @@
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #    
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #                                                                                               #
-#                                         AnvilPlus                                             #
+#                                    CustomGuiForAnvil                                          #
 #                           Created by eliotesta98 & xSavior_of_God                             #
 #                                                                                               #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #   
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 Configuration:
   # Set whether various plugins should be hooked into (i will also check if is enabled).
@@ -11,15 +11,52 @@ Configuration:
     EcoEnchants: false
     AdvancedEnchantments: false
 
+Interface:
+  Anvil:
+    Title: "&aAnvil"
+    OpenSound: ENTITY_ENDER_DRAGON_FLAP # ENDERDRAGON_WINGS <1.13
+    Slots:
+      - 'bbbbbbbbb'
+      - 'b b bb bb'
+      - 'bbbbbbbbb'
+    Items:
+      Item:
+        Letter: 'f'
+        Name: ''
+        Type: ''
+        Texture: ''
+        Lore: []
+        SoundClick: ''
+      Enchant:
+        Letter: 's'
+        Name: ''
+        Type: ''
+        Texture: ''
+        Lore: [ ]
+        SoundClick: ''
+      Result:
+        Letter: 'r'
+        Name: ''
+        Type: ''
+        Texture: ''
+        Lore: [ ]
+        SoundClick: ''
+      Border:
+        Letter: 'b'
+        Name: " "
+        Type: GRAY_STAINED_GLASS_PANE # STAINED_GLASS_PANE;7 <1.13
+        Texture: '' # set to '' to disable
+        Lore: [ ]
+        SoundClick: ''
 
 # you can use a different coloring by using a hexadecimal. for all messages Ex. &{#FFFF00}(yellow).
-# Example for a command: '/labyrinth &{#FFFF00}<reload>&{#000000} command reload Labyrinth plugin'
+# Example for a command: '/cgfa &{#FFFF00}<reload>&{#000000} command reload Labyrinth plugin'
 Messages:
-  Prefix: '&eAnvilPlus &r'
+  Prefix: '&eCustomGuiForAnvil &r'
   Commands:
     Footer: '&7(&7&l(&c&l!&7&l)&7) &9[] optional value, <> required'
-    Reload: '   &e/anvilplus &6<reload> &7for reload AnvilPlus plugin'
-    Help: '   &e/anvilplus &6<help> &7for help commands'
+    Reload: '   &e/cgfa &6<reload> &7for reload CustomGuiForAnvil plugin'
+    Help: '   &e/cgfa &6<help> &7for help commands'
   Success: {}
   Lists: {}
   Warnings: {}
@@ -29,9 +66,11 @@ Messages:
     InsufficientPermission: '{prefix}&cInsufficient permission'
 
 Debug:
-  # Commands time execution
+  # Commands execution
   Commands: false
-  # Enabled time execution
+  # Enabled of plugin
   Enabled: false
-  # Disabled time execution
+  # Disabled of plugin
   Disabled: false
+  # Click in the gui
+  ClickGui: false
