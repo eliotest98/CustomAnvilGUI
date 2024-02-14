@@ -1,9 +1,9 @@
-package io.eliotesta98.AnvilPlus.Commands;
+package io.eliotesta98.CustomGuiForAnvil.Commands;
 
-import io.eliotesta98.AnvilPlus.Core.Main;
-import io.eliotesta98.AnvilPlus.Utils.ColorUtils;
-import io.eliotesta98.AnvilPlus.Utils.DebugUtils;
-import io.eliotesta98.AnvilPlus.Utils.ReloadUtils;
+import io.eliotesta98.CustomGuiForAnvil.Core.Main;
+import io.eliotesta98.CustomGuiForAnvil.Utils.ColorUtils;
+import io.eliotesta98.CustomGuiForAnvil.Utils.DebugUtils;
+import io.eliotesta98.CustomGuiForAnvil.Utils.ReloadUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -26,7 +26,7 @@ public class Commands implements CommandExecutor {
         long tempo = System.currentTimeMillis();
         if (!(sender instanceof Player)) {
             Bukkit.getScheduler().runTaskAsynchronously(Main.instance, () -> {
-                if (!command.getName().equalsIgnoreCase("anvilplus")) {// comando se esiste
+                if (!command.getName().equalsIgnoreCase("cgfa")) {// comando se esiste
                     sender.sendMessage(ColorUtils.applyColor(errorCommandNotFound));
                     if (debugCommands) {
                         debug.addLine("Commands execution time= " + (System.currentTimeMillis() - tempo));
@@ -36,7 +36,7 @@ public class Commands implements CommandExecutor {
                 }
                 // no args
                 if (args.length == 0) {
-                    String finale = "&e&lAnvilPlus &7● Version " + Main.instance.getDescription().getVersion()
+                    String finale = "&e&lCustomGuiForAnvil &7● Version " + Main.instance.getDescription().getVersion()
                             + " created by eliotesta98 & xSavior_of_God" + "\n\n";
                     finale = finale + commandHelpHelp + "\n";
                     finale = finale + commandReloadHelp + "\n";
@@ -57,10 +57,11 @@ public class Commands implements CommandExecutor {
                         }
                         return;
                     }
-                    String finale = "&e&lAnvilPlus &7● Version " + Main.instance.getDescription().getVersion()
+                    String finale = "&e&lCustomGuiForAnvil &7● Version " + Main.instance.getDescription().getVersion()
                             + " created by eliotesta98 & xSavior_of_God" + "\n\n";
                     finale = finale + commandHelpHelp + "\n";
                     finale = finale + commandReloadHelp + "\n";
+                    finale = finale + "\n";
                     finale = finale + commandFooter;
                     sender.sendMessage(ColorUtils.applyColor(finale));
                     if (debugCommands) {
@@ -90,10 +91,11 @@ public class Commands implements CommandExecutor {
                 }
                 // args incorrect
                 else {
-                    String finale = "&e&lAnvilPlus &7● Version " + Main.instance.getDescription().getVersion()
+                    String finale = "&e&lCustomGuiForAnvil &7● Version " + Main.instance.getDescription().getVersion()
                             + " created by eliotesta98 & xSavior_of_God" + "\n\n";
                     finale = finale + commandHelpHelp + "\n";
                     finale = finale + commandReloadHelp + "\n";
+                    finale = finale + "\n";
                     finale = finale + commandFooter;
                     sender.sendMessage(ColorUtils.applyColor(finale));
                     if (debugCommands) {
@@ -104,7 +106,7 @@ public class Commands implements CommandExecutor {
             });
         } else {
             final Player p = (Player) sender;
-            if (!command.getName().equalsIgnoreCase("anvilplus")) {// comando se esiste
+            if (!command.getName().equalsIgnoreCase("cgfa")) {// comando se esiste
                 p.sendMessage(ColorUtils.applyColor(errorCommandNotFound));
                 if (debugCommands) {
                     debug.addLine("Commands execution time= " + (System.currentTimeMillis() - tempo));
@@ -115,14 +117,15 @@ public class Commands implements CommandExecutor {
             Bukkit.getScheduler().runTaskAsynchronously(Main.instance, () -> {
                 // no args
                 if (args.length == 0) {
-                    String finale = "&e&lAnvilPlus &7● Version " + Main.instance.getDescription().getVersion()
+                    String finale = "&e&lCustomGuiForAnvil &7● Version " + Main.instance.getDescription().getVersion()
                             + " created by eliotesta98 & xSavior_of_God" + "\n\n";
-                    if (p.hasPermission("anvilplus.help.command")) {
+                    if (p.hasPermission("cgfa.command.help")) {
                         finale = finale + commandHelpHelp + "\n";
                     }
-                    if (p.hasPermission("anvilplus.reload.command")) {
+                    if (p.hasPermission("cgfa.command.reload")) {
                         finale = finale + commandReloadHelp + "\n";
                     }
+                    finale = finale + "\n";
                     finale = finale + commandFooter;
                     p.sendMessage(ColorUtils.applyColor(finale));
                     if (debugCommands) {
@@ -132,7 +135,7 @@ public class Commands implements CommandExecutor {
                 }
                 // help
                 else if (args[0].equalsIgnoreCase("help")) {
-                    if (!p.hasPermission("labyrinth.help.command")) {
+                    if (!p.hasPermission("cgfa.command.help")) {
                         p.sendMessage(ColorUtils.applyColor(errorInsufficientPermission));
                         if (debugCommands) {
                             debug.addLine("Commands execution time= " + (System.currentTimeMillis() - tempo));
@@ -143,14 +146,15 @@ public class Commands implements CommandExecutor {
                     if (args.length != 1) {
                         p.sendMessage(ColorUtils.applyColor(commandHelpHelp));
                     } else {
-                        String finale = "&e&lAnvilPlus &7● Version " + Main.instance.getDescription().getVersion()
+                        String finale = "&e&lCustomGuiForAnvil &7● Version " + Main.instance.getDescription().getVersion()
                                 + " created by eliotesta98 & xSavior_of_God" + "\n\n";
-                        if (p.hasPermission("anvilplus.help.command")) {
+                        if (p.hasPermission("cgfa.command.help")) {
                             finale = finale + commandHelpHelp + "\n";
                         }
-                        if (p.hasPermission("anvilplus.reload.command")) {
+                        if (p.hasPermission("cgfa.command.reload")) {
                             finale = finale + commandReloadHelp + "\n";
                         }
+                        finale = finale + "\n";
                         finale = finale + commandFooter;
                         p.sendMessage(ColorUtils.applyColor(finale));
                     }
@@ -162,7 +166,7 @@ public class Commands implements CommandExecutor {
                 // reload
                 else if (args[0].equalsIgnoreCase("reload")) {
                     // controllo se ha il permesso
-                    if (!p.hasPermission("labyrinth.reload.command")) {
+                    if (!p.hasPermission("cgfa.command.reload")) {
                         p.sendMessage(ColorUtils.applyColor(errorInsufficientPermission));
                         if (debugCommands) {
                             debug.addLine("Commands execution time= " + (System.currentTimeMillis() - tempo));
@@ -191,14 +195,15 @@ public class Commands implements CommandExecutor {
                 }
                 // args incorrect
                 else {
-                    String finale = "&e&lAnvilPlus &7● Version " + Main.instance.getDescription().getVersion()
+                    String finale = "&e&lCustomGuiForAnvil &7● Version " + Main.instance.getDescription().getVersion()
                             + " created by eliotesta98 & xSavior_of_God" + "\n\n";
-                    if (p.hasPermission("anvilplus.help.command")) {
+                    if (p.hasPermission("cgfa.command.help")) {
                         finale = finale + commandHelpHelp + "\n";
                     }
-                    if (p.hasPermission("anvilplus.reload.command")) {
+                    if (p.hasPermission("cgfa.command.reload")) {
                         finale = finale + commandReloadHelp + "\n";
                     }
+                    finale = finale + "\n";
                     finale = finale + commandFooter;
                     p.sendMessage(ColorUtils.applyColor(finale));
                     if (debugCommands) {
