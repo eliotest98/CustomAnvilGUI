@@ -5,6 +5,7 @@ import io.eliotesta98.CustomGuiForAnvil.Database.ConfigGestion;
 import io.eliotesta98.CustomGuiForAnvil.Events.AnvilEvents;
 import io.eliotesta98.CustomGuiForAnvil.Events.CustomPrepareAnvilListener;
 import io.eliotesta98.CustomGuiForAnvil.Interfaces.GuiEvent;
+import io.eliotesta98.CustomGuiForAnvil.Interfaces._AnvilInterfaceManagement;
 import io.eliotesta98.CustomGuiForAnvil.Utils.CommentedConfiguration;
 import io.eliotesta98.CustomGuiForAnvil.Utils.DebugUtils;
 import io.eliotesta98.CustomGuiForAnvil.Utils.Library;
@@ -129,9 +130,10 @@ public class Main extends JavaPlugin {
             }
         });
 
-        Bukkit.getServer().getPluginManager().registerEvents(new AnvilEvents(), this);
-        Bukkit.getServer().getPluginManager().registerEvents(new CustomPrepareAnvilListener(), this);
-        Bukkit.getServer().getPluginManager().registerEvents(new GuiEvent(), this);
+        // Bukkit.getServer().getPluginManager().registerEvents(new AnvilEvents(), this);
+        // Bukkit.getServer().getPluginManager().registerEvents(new CustomPrepareAnvilListener(), this);
+        // Bukkit.getServer().getPluginManager().registerEvents(new GuiEvent(), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new _AnvilInterfaceManagement(), this);
         getCommand("cgfa").setExecutor(new Commands());
 
         if (config.getDebug().get("Enabled")) {
