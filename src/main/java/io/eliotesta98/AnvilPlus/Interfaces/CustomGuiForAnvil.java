@@ -1,9 +1,8 @@
-package io.eliotesta98.CustomGuiForAnvil.Interfaces;
+package io.eliotesta98.AnvilPlus.Interfaces;
 
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.InventoryView;
 
 public class CustomGuiForAnvil implements InventoryHolder {
 

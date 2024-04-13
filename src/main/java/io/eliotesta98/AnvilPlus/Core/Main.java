@@ -1,23 +1,21 @@
-package io.eliotesta98.CustomGuiForAnvil.Core;
+package io.eliotesta98.AnvilPlus.Core;
 
-import io.eliotesta98.CustomGuiForAnvil.Commands.Commands;
-import io.eliotesta98.CustomGuiForAnvil.Database.ConfigGestion;
-import io.eliotesta98.CustomGuiForAnvil.Events.AnvilEvents;
-import io.eliotesta98.CustomGuiForAnvil.Events.CustomPrepareAnvilListener;
-import io.eliotesta98.CustomGuiForAnvil.Interfaces.GuiEvent;
-import io.eliotesta98.CustomGuiForAnvil.Interfaces._AnvilInterfaceManagement;
-import io.eliotesta98.CustomGuiForAnvil.Utils.CommentedConfiguration;
-import io.eliotesta98.CustomGuiForAnvil.Utils.DebugUtils;
-import io.eliotesta98.CustomGuiForAnvil.Utils.Library;
-import io.eliotesta98.CustomGuiForAnvil.Utils.SoundManager;
+import io.eliotesta98.AnvilPlus.Commands.Commands;
+import io.eliotesta98.AnvilPlus.Database.ConfigGestion;
+import io.eliotesta98.AnvilPlus.Interfaces.GuiEvent;
+import io.eliotesta98.AnvilPlus.Interfaces.Interface;
+import io.eliotesta98.AnvilPlus.Utils.CommentedConfiguration;
+import io.eliotesta98.AnvilPlus.Utils.DebugUtils;
+import io.eliotesta98.AnvilPlus.Utils.Library;
+import io.eliotesta98.AnvilPlus.Utils.SoundManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Main extends JavaPlugin {
 
@@ -130,11 +128,8 @@ public class Main extends JavaPlugin {
             }
         });
 
-        // Bukkit.getServer().getPluginManager().registerEvents(new AnvilEvents(), this);
-        // Bukkit.getServer().getPluginManager().registerEvents(new CustomPrepareAnvilListener(), this);
-        // Bukkit.getServer().getPluginManager().registerEvents(new GuiEvent(), this);
-        Bukkit.getServer().getPluginManager().registerEvents(new _AnvilInterfaceManagement(), this);
-        getCommand("cgfa").setExecutor(new Commands());
+        Bukkit.getServer().getPluginManager().registerEvents(new GuiEvent(), this);
+        getCommand("anvilplus").setExecutor(new Commands());
 
         if (config.getDebug().get("Enabled")) {
             debugsistem.addLine("Enabled execution time= " + (System.currentTimeMillis() - tempo));
@@ -146,6 +141,9 @@ public class Main extends JavaPlugin {
         DebugUtils debugsistem = new DebugUtils();
         long tempo = System.currentTimeMillis();
         Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "CustomGuiForAnvil has been disabled, §cBye bye! §e:(");
+        for(Map.Entry<String, Interface> inventory: Main.instance.getConfigGestion().getInterfaces().entrySet()) {
+            inventory.getValue().closeAllInventories();
+        }
         if (config.getDebug().get("Disabled")) {
             debugsistem.addLine("Disabled execution time= " + (System.currentTimeMillis() - tempo));
             debugsistem.debug("Disabled");

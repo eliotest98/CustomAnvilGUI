@@ -7,18 +7,16 @@
 
 Configuration:
   # Set whether various plugins should be hooked into (i will also check if is enabled).
-  Hooks:
-    EcoEnchants: false
-    AdvancedEnchantments: false
+  Hooks: {}
 
 Interface:
   Anvil:
     Title: "&aAnvil"
     OpenSound: ENTITY_ENDER_DRAGON_FLAP # ENDERDRAGON_WINGS <1.13
     Slots:
-      - 'bbbbbbbbb'
-      - 'b b bb bb'
-      - 'bbbbbbbbb'
+      - 'bbbbbbbbx'
+      - 'bfbsbcbrb'
+      - 'bbbbbebbb'
     Items:
       Item:
         Letter: 'f'
@@ -34,10 +32,31 @@ Interface:
         Texture: ''
         Lore: [ ]
         SoundClick: ''
+      Confirm:
+        Letter: 'e'
+        Name: '&a&lConfirm Items'
+        Type: 'SUNFLOWER'
+        Texture: ''
+        Lore: [ ]
+        SoundClick: ''
       Result:
         Letter: 'r'
         Name: ''
         Type: ''
+        Texture: ''
+        Lore: [ ]
+        SoundClick: ''
+      Cost:
+        Letter: 'c'
+        Name: '&a&lEnchanting Cost: &c&l{exp}'
+        Type: 'EXPERIENCE_BOTTLE'
+        Texture: ''
+        Lore: []
+        SoundClick: ''
+      Back:
+        Letter: 'x'
+        Name: '&a&lBack to Anvil'
+        Type: 'IRON_DOOR'
         Texture: ''
         Lore: [ ]
         SoundClick: ''
@@ -52,7 +71,7 @@ Interface:
 # you can use a different coloring by using a hexadecimal. for all messages Ex. &{#FFFF00}(yellow).
 # Example for a command: '/cgfa &{#FFFF00}<reload>&{#000000} command reload Labyrinth plugin'
 Messages:
-  Prefix: '&eCustomGuiForAnvil &r'
+  Prefix: '&eAnvilPlus &r'
   Commands:
     Footer: '&7(&7&l(&c&l!&7&l)&7) &9[] optional value, <> required'
     Reload: '   &e/cgfa &6<reload> &7for reload CustomGuiForAnvil plugin'
@@ -64,6 +83,7 @@ Messages:
     NoPlayer: '{prefix}&cYou are not a player'
     CommandNotFound: '{prefix}&cCommand not found'
     InsufficientPermission: '{prefix}&cInsufficient permission'
+    InsufficientExperience: '{prefix}&cHEY! &7You don''t have much experience for enchant this items!'
 
 Debug:
   # Commands execution

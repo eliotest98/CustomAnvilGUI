@@ -1,4 +1,4 @@
-package io.eliotesta98.CustomGuiForAnvil.Utils;
+package io.eliotesta98.AnvilPlus.Utils;
 
 import net.md_5.bungee.api.ChatColor;
 

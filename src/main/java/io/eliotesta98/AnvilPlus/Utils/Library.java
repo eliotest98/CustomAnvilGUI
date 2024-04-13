@@ -1,6 +1,6 @@
-package io.eliotesta98.CustomGuiForAnvil.Utils;
+package io.eliotesta98.AnvilPlus.Utils;
 
-import io.eliotesta98.CustomGuiForAnvil.Core.Main;
+import io.eliotesta98.AnvilPlus.Core.Main;
 import org.bukkit.Bukkit;
 
 import java.io.File;

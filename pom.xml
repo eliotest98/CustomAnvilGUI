@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>CustomGuiForAnvil</groupId>
-	<artifactId>CustomGuiForAnvil</artifactId>
+	<groupId>AnvilPlus</groupId>
+	<artifactId>AnvilPlus</artifactId>
 	<version>1.0</version>
 
 	<properties>
@@ -13,7 +13,7 @@
 	</properties>
 
 	<build>
-		<finalName>CustomGuiForAnvil ${project.version}</finalName>
+		<finalName>AnvilPlus ${project.version}</finalName>
 		<defaultGoal>clean package</defaultGoal>
 		<sourceDirectory>${basedir}/src/main/java</sourceDirectory>
 		<resources>
