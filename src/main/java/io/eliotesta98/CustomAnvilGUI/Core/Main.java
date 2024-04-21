@@ -35,7 +35,7 @@ public class Main extends JavaPlugin {
         int bStatsId = 17780;
 
         getServer().getConsoleSender()
-                .sendMessage("\n\r\n\r\n\r §a #####      #      #####   #     #  ### \n" +
+                .sendMessage("\r\n \r\n \r\n §a #####      #      #####   #     #  ### \n" +
                         "§a #     #    # #    #     #  #     #   #  \n" +
                         "§a #         #   #   #        #     #   #  \n" +
                         "§a #        #     #  #  ####  #     #   #  \n" +
