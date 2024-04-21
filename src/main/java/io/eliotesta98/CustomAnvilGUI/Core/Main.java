@@ -7,7 +7,6 @@ import io.eliotesta98.CustomAnvilGUI.Interfaces.Interface;
 import io.eliotesta98.CustomAnvilGUI.Utils.CommentedConfiguration;
 import io.eliotesta98.CustomAnvilGUI.Utils.DebugUtils;
 import io.eliotesta98.CustomAnvilGUI.Utils.Library;
-import io.eliotesta98.CustomAnvilGUI.Utils.SoundManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -20,7 +19,6 @@ import java.util.Map;
 public class Main extends JavaPlugin {
 
     public static Main instance;
-    public SoundManager SoundManager;
     private ConfigGestion config;
 
     @Override
@@ -37,17 +35,18 @@ public class Main extends JavaPlugin {
         int bStatsId = 17780;
 
         getServer().getConsoleSender()
-                .sendMessage("\n\r\n\r §a______  _______  _______  _______ \n" +
-                        "§a|      ||     __||    ___||   _   |\n" +
-                        "§a|   ---||    |  ||    ___||       |\n" +
-                        "§a|______||_______||___|    |___|___|\n" +
-                        "                                   \n"
+                .sendMessage("\n\r\n\r\n\r §a #####      #      #####   #     #  ### \n" +
+                        "§a #     #    # #    #     #  #     #   #  \n" +
+                        "§a #         #   #   #        #     #   #  \n" +
+                        "§a #        #     #  #  ####  #     #   #  \n" +
+                        "§a #        #######  #     #  #     #   #  \n" +
+                        "§a #     #  #     #  #     #  #     #   #  \n" +
+                        "§a  #####   #     #   #####    #####   ### " +
+                        "                                   \n\n"
                         + "§e  Version " + getDescription().getVersion() + " \r\n"
-                        + "§e© Developed by §feliotesta98 & xSavior_of_God §ewith §4<3 \r\n \r\n \r\n");
+                        + "§e© Developed by §feliotesta98 & xSavior_of_God §ewith §4<3 \r\n \r\n");
 
         this.getServer().getConsoleSender().sendMessage("§6Loading config...");
-
-        this.SoundManager = new SoundManager();
 
         File configFile = new File(this.getDataFolder(), "config.yml");
 
