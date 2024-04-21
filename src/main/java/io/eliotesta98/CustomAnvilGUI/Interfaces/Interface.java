@@ -13,22 +13,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Interface {
-
     private String title, soundOpen, nameInterface, nameInterfaceToOpen, nameInterfaceToReturn;
     private ArrayList<String> slots = new ArrayList<>();
     private HashMap<String, io.eliotesta98.CustomAnvilGUI.Interfaces.ItemConfig> itemsConfig = new HashMap<>();
     private boolean debug;
-    private int sizeModificableSlot;
+    private int sizeModifiableSlot;
     private final Map<String, InventoryView> anvilInventories = new HashMap<>();
     private final Map<String, Integer> importantSlots = new HashMap<>();
     private final Map<String, String> importantSlotsLetter = new HashMap<>();
 
-    public Interface(String title, String soundOpen, ArrayList<String> slots, HashMap<String, io.eliotesta98.CustomAnvilGUI.Interfaces.ItemConfig> itemsConfig, boolean debug, int sizeModificableSlot, String nameInterface, String nameInterfaceToOpen, String nameInterfaceToReturn) {
+    public Interface(String title, String soundOpen, ArrayList<String> slots, HashMap<String, io.eliotesta98.CustomAnvilGUI.Interfaces.ItemConfig> itemsConfig, boolean debug, int sizeModifiableSlot, String nameInterface, String nameInterfaceToOpen, String nameInterfaceToReturn) {
         this.title = title;
         this.soundOpen = soundOpen;
         this.itemsConfig.putAll(itemsConfig);
         this.debug = debug;
-        this.sizeModificableSlot = sizeModificableSlot;
+        this.sizeModifiableSlot = sizeModifiableSlot;
         this.slots.addAll(slots);
         this.nameInterface = nameInterface;
         this.nameInterfaceToOpen = nameInterfaceToOpen;
@@ -75,12 +74,12 @@ public class Interface {
         this.debug = debug;
     }
 
-    public int getSizeModificableSlot() {
-        return sizeModificableSlot;
+    public int getSizeModifiableSlot() {
+        return sizeModifiableSlot;
     }
 
-    public void setSizeModificableSlot(int sizeModificableSlot) {
-        this.sizeModificableSlot = sizeModificableSlot;
+    public void setSizeModifiableSlot(int sizeModifiableSlot) {
+        this.sizeModifiableSlot = sizeModifiableSlot;
     }
 
     public String getNameInterface() {
@@ -114,12 +113,12 @@ public class Interface {
         }
         Interface customInterface = Main.instance.getConfigGestion().getInterfaces().get("Anvil");
 
-        int itemSlot = customInterface.getImportantSlots().get("Item");
+        int itemSlot = customInterface.getImportantSlots().get("FirstItem");
         ItemStack item = inventory.getItem(itemSlot);
         if (item != null) {
             dropLocation.getWorld().dropItem(dropLocation, item);
         }
-        int enchantSlot = customInterface.getImportantSlots().get("Enchant");
+        int enchantSlot = customInterface.getImportantSlots().get("SecondItem");
         ItemStack enchantedBook = inventory.getItem(enchantSlot);
         if (enchantedBook != null) {
             dropLocation.getWorld().dropItem(dropLocation, enchantedBook);
@@ -167,9 +166,9 @@ public class Interface {
     }
 
     public void deleteItemsWhenResult(Inventory inventory) {
-        int slotToChange = importantSlots.get("Item");
+        int slotToChange = importantSlots.get("FirstItem");
         inventory.setItem(slotToChange, null);
-        slotToChange = importantSlots.get("Enchant");
+        slotToChange = importantSlots.get("SecondItem");
         inventory.setItem(slotToChange, null);
     }
 
@@ -191,10 +190,10 @@ public class Interface {
                 if (this.getItemsConfig().get(slot) == null) {
                     continue;
                 }
-                if (this.itemsConfig.get(slot).getNameItemConfig().equalsIgnoreCase("Item")) {
+                if (this.itemsConfig.get(slot).getNameItemConfig().equalsIgnoreCase("FirstItem")) {
                     importantSlots.putIfAbsent(this.itemsConfig.get(slot).getNameItemConfig(), i);
                     importantSlotsLetter.putIfAbsent(this.itemsConfig.get(slot).getNameItemConfig(), slot);
-                } else if (this.itemsConfig.get(slot).getNameItemConfig().equalsIgnoreCase("Enchant")) {
+                } else if (this.itemsConfig.get(slot).getNameItemConfig().equalsIgnoreCase("SecondItem")) {
                     importantSlots.putIfAbsent(this.itemsConfig.get(slot).getNameItemConfig(), i);
                     importantSlotsLetter.putIfAbsent(this.itemsConfig.get(slot).getNameItemConfig(), slot);
                 } else if (this.itemsConfig.get(slot).getNameItemConfig().equalsIgnoreCase("Result")) {

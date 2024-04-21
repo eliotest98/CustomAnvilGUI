@@ -7,30 +7,37 @@
 
 Interface:
   Anvil:
-    Title: "&aAnvil"
+    Title: "&0Repair & Name"
     OpenSound: ENTITY_ENDER_DRAGON_FLAP # ENDERDRAGON_WINGS <1.13
     Slots:
       - 'bbbbbbbbx'
-      - 'bfbsbcbrb'
-      - 'bbbbbebbb'
+      - 'bfbsbebrb'
+      - 'nbbbbbbcb'
     Items:
-      Item:
+      FirstItem:
         Letter: 'f'
         Name: ''
         Type: ''
         Texture: ''
         Lore: []
         SoundClick: ''
-      Enchant:
+      SecondItem:
         Letter: 's'
         Name: ''
         Type: ''
         Texture: ''
         Lore: [ ]
         SoundClick: ''
-      Confirm:
+      Check:
         Letter: 'e'
-        Name: '&a&lConfirm Items'
+        Name: '&2>&a&l> &a&lCHECK RESULT <&2<'
+        Type: 'SPYGLASS'
+        Texture: ''
+        Lore: [ ]
+        SoundClick: ''
+      Submit:
+        Letter: 'e'
+        Name: '&2>&a&l> &a&lSUBMIT <&2<'
         Type: 'SUNFLOWER'
         Texture: ''
         Lore: [ ]
@@ -42,17 +49,31 @@ Interface:
         Texture: ''
         Lore: [ ]
         SoundClick: ''
+      NoResult:
+        Letter: 'r'
+        Name: ''
+        Type: ''
+        Texture: ''
+        Lore: [ ]
+        SoundClick: ''
       Cost:
         Letter: 'c'
-        Name: '&a&lEnchanting Cost: &c&l{exp}'
+        Name: '&a&oEnchantment Cost: {exp}'
         Type: 'EXPERIENCE_BOTTLE'
         Texture: ''
         Lore: []
         SoundClick: ''
       Back:
         Letter: 'x'
-        Name: '&a&lBack to Anvil'
-        Type: 'IRON_DOOR'
+        Name: '&7&l&oBACK TO ANVIL'
+        Type: 'DAMAGED_ANVIL'
+        Texture: ''
+        Lore: [ ]
+        SoundClick: ''
+      Rename:
+        Letter: 'n'
+        Name: '{item_name}'
+        Type: 'NAME_TAG'
         Texture: ''
         Lore: [ ]
         SoundClick: ''
