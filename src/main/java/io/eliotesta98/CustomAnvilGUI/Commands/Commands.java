@@ -1,9 +1,9 @@
-package io.eliotesta98.CustomGuiForAnvil.Commands;
+package io.eliotesta98.CustomAnvilGUI.Commands;
 
-import io.eliotesta98.CustomGuiForAnvil.Core.Main;
-import io.eliotesta98.CustomGuiForAnvil.Utils.ColorUtils;
-import io.eliotesta98.CustomGuiForAnvil.Utils.DebugUtils;
-import io.eliotesta98.CustomGuiForAnvil.Utils.ReloadUtils;
+import io.eliotesta98.CustomAnvilGUI.Core.Main;
+import io.eliotesta98.CustomAnvilGUI.Utils.ColorUtils;
+import io.eliotesta98.CustomAnvilGUI.Utils.DebugUtils;
+import io.eliotesta98.CustomAnvilGUI.Utils.ReloadUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -26,7 +26,7 @@ public class Commands implements CommandExecutor {
         long tempo = System.currentTimeMillis();
         if (!(sender instanceof Player)) {
             Bukkit.getScheduler().runTaskAsynchronously(Main.instance, () -> {
-                if (!command.getName().equalsIgnoreCase("cgfa")) {// comando se esiste
+                if (!command.getName().equalsIgnoreCase("customanvilgui")) {// comando se esiste
                     sender.sendMessage(ColorUtils.applyColor(errorCommandNotFound));
                     if (debugCommands) {
                         debug.addLine("Commands execution time= " + (System.currentTimeMillis() - tempo));
@@ -36,7 +36,7 @@ public class Commands implements CommandExecutor {
                 }
                 // no args
                 if (args.length == 0) {
-                    String finale = "&e&lCustomGuiForAnvil &7● Version " + Main.instance.getDescription().getVersion()
+                    String finale = "&e&lCustomAnvilGUI &7● Version " + Main.instance.getDescription().getVersion()
                             + " created by eliotesta98 & xSavior_of_God" + "\n\n";
                     finale = finale + commandHelpHelp + "\n";
                     finale = finale + commandReloadHelp + "\n";
@@ -57,7 +57,7 @@ public class Commands implements CommandExecutor {
                         }
                         return;
                     }
-                    String finale = "&e&lCustomGuiForAnvil &7● Version " + Main.instance.getDescription().getVersion()
+                    String finale = "&e&lCustomAnvilGUI &7● Version " + Main.instance.getDescription().getVersion()
                             + " created by eliotesta98 & xSavior_of_God" + "\n\n";
                     finale = finale + commandHelpHelp + "\n";
                     finale = finale + commandReloadHelp + "\n";
@@ -91,7 +91,7 @@ public class Commands implements CommandExecutor {
                 }
                 // args incorrect
                 else {
-                    String finale = "&e&lCustomGuiForAnvil &7● Version " + Main.instance.getDescription().getVersion()
+                    String finale = "&e&lCustomAnvilGUI &7● Version " + Main.instance.getDescription().getVersion()
                             + " created by eliotesta98 & xSavior_of_God" + "\n\n";
                     finale = finale + commandHelpHelp + "\n";
                     finale = finale + commandReloadHelp + "\n";
@@ -106,7 +106,7 @@ public class Commands implements CommandExecutor {
             });
         } else {
             final Player p = (Player) sender;
-            if (!command.getName().equalsIgnoreCase("cgfa")) {// comando se esiste
+            if (!command.getName().equalsIgnoreCase("customanvilgui")) {// comando se esiste
                 p.sendMessage(ColorUtils.applyColor(errorCommandNotFound));
                 if (debugCommands) {
                     debug.addLine("Commands execution time= " + (System.currentTimeMillis() - tempo));
@@ -117,12 +117,12 @@ public class Commands implements CommandExecutor {
             Bukkit.getScheduler().runTaskAsynchronously(Main.instance, () -> {
                 // no args
                 if (args.length == 0) {
-                    String finale = "&e&lCustomGuiForAnvil &7● Version " + Main.instance.getDescription().getVersion()
+                    String finale = "&e&lCustomAnvilGUI &7● Version " + Main.instance.getDescription().getVersion()
                             + " created by eliotesta98 & xSavior_of_God" + "\n\n";
-                    if (p.hasPermission("cgfa.command.help")) {
+                    if (p.hasPermission("cagui.command.help")) {
                         finale = finale + commandHelpHelp + "\n";
                     }
-                    if (p.hasPermission("cgfa.command.reload")) {
+                    if (p.hasPermission("cagui.command.reload")) {
                         finale = finale + commandReloadHelp + "\n";
                     }
                     finale = finale + "\n";
@@ -135,7 +135,7 @@ public class Commands implements CommandExecutor {
                 }
                 // help
                 else if (args[0].equalsIgnoreCase("help")) {
-                    if (!p.hasPermission("cgfa.command.help")) {
+                    if (!p.hasPermission("cagui.command.help")) {
                         p.sendMessage(ColorUtils.applyColor(errorInsufficientPermission));
                         if (debugCommands) {
                             debug.addLine("Commands execution time= " + (System.currentTimeMillis() - tempo));
@@ -146,12 +146,12 @@ public class Commands implements CommandExecutor {
                     if (args.length != 1) {
                         p.sendMessage(ColorUtils.applyColor(commandHelpHelp));
                     } else {
-                        String finale = "&e&lCustomGuiForAnvil &7● Version " + Main.instance.getDescription().getVersion()
+                        String finale = "&e&lCustomAnvilGUI &7● Version " + Main.instance.getDescription().getVersion()
                                 + " created by eliotesta98 & xSavior_of_God" + "\n\n";
-                        if (p.hasPermission("cgfa.command.help")) {
+                        if (p.hasPermission("cagui.command.help")) {
                             finale = finale + commandHelpHelp + "\n";
                         }
-                        if (p.hasPermission("cgfa.command.reload")) {
+                        if (p.hasPermission("cagui.command.reload")) {
                             finale = finale + commandReloadHelp + "\n";
                         }
                         finale = finale + "\n";
@@ -166,7 +166,7 @@ public class Commands implements CommandExecutor {
                 // reload
                 else if (args[0].equalsIgnoreCase("reload")) {
                     // controllo se ha il permesso
-                    if (!p.hasPermission("cgfa.command.reload")) {
+                    if (!p.hasPermission("cagui.command.reload")) {
                         p.sendMessage(ColorUtils.applyColor(errorInsufficientPermission));
                         if (debugCommands) {
                             debug.addLine("Commands execution time= " + (System.currentTimeMillis() - tempo));
@@ -195,12 +195,12 @@ public class Commands implements CommandExecutor {
                 }
                 // args incorrect
                 else {
-                    String finale = "&e&lCustomGuiForAnvil &7● Version " + Main.instance.getDescription().getVersion()
+                    String finale = "&e&lCustomAnvilGUI &7● Version " + Main.instance.getDescription().getVersion()
                             + " created by eliotesta98 & xSavior_of_God" + "\n\n";
-                    if (p.hasPermission("cgfa.command.help")) {
+                    if (p.hasPermission("cagui.command.help")) {
                         finale = finale + commandHelpHelp + "\n";
                     }
-                    if (p.hasPermission("cgfa.command.reload")) {
+                    if (p.hasPermission("cagui.command.reload")) {
                         finale = finale + commandReloadHelp + "\n";
                     }
                     finale = finale + "\n";

@@ -1,9 +1,9 @@
-package io.eliotesta98.CustomGuiForAnvil.Interfaces;
+package io.eliotesta98.CustomAnvilGUI.Interfaces;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import de.tr7zw.nbtapi.NBTItem;
-import io.eliotesta98.CustomGuiForAnvil.Utils.ColorUtils;
+import io.eliotesta98.CustomAnvilGUI.Utils.ColorUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -11,6 +11,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.profile.PlayerProfile;
 import org.bukkit.profile.PlayerTextures;
+
 import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -71,7 +72,24 @@ public class ItemConfig {
             }
             itemm.setLore(lorenew);
         }
-        itemm.setDisplayName(ColorUtils.applyColor(name));
+        String newName = "";
+        if (name.contains("{exp}")) {
+            String cost = "";
+            if (!nbt.equalsIgnoreCase("")) {
+                String[] nbtList = nbt.split(";");
+                for (String nbtString : nbtList) {
+                    String[] nbtSplit = nbtString.split(":");
+                    if (nbtSplit[0].equalsIgnoreCase("ap.experience")) {
+                        cost = nbtSplit[1];
+                        break;
+                    }
+                }
+            }
+            newName = name.replace("{exp}", cost);
+        } else {
+            newName = name;
+        }
+        itemm.setDisplayName(ColorUtils.applyColor(newName));
         item.setItemMeta(itemm);
         if (item.getType().toString().equalsIgnoreCase("AIR")) {
             return item;
@@ -89,8 +107,8 @@ public class ItemConfig {
                 }
             }
         }
-        nbtItem.setInteger("cgfa.positionItem", positionItem);
-        nbtItem.setString("cgfa.currentInterface", currentInterface);
+        nbtItem.setInteger("ap.positionItem", positionItem);
+        nbtItem.setString("ap.currentInterface", currentInterface);
         return nbtItem.getItem();
     }
 

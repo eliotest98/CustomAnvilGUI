@@ -1,4 +1,4 @@
-package io.eliotesta98.CustomGuiForAnvil.Utils;
+package io.eliotesta98.CustomAnvilGUI.Utils;
 /*******************************************************************************
  *
  *     CommentedConfiguration

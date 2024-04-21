@@ -1,6 +1,6 @@
-name: CustomGuiForAnvil
+name: CustomAnvilGUI
 version: maven-version-number
-main: io.eliotesta98.CustomGuiForAnvil.Core.Main
+main: io.eliotesta98.CustomAnvilGUI.Core.Main
 api-version: 1.13
 authors: [eliotesta98, xSavior_of_God]
 softdepend: []
@@ -15,12 +15,12 @@ legacy-libraries:
 
 depend: []
 commands:
-  cgfa:
-    aliases: [customguiforanvil]
+  customanvilgui:
+    aliases: [cagui]
 permissions:
-  cgfa.command.help:
-    description: /cgfa <help>
+  cagui.command.help:
+    description: /cagui <help>
     default: op
-  cgfa.command.reload:
-    description: /cgfa <reload>
+  cagui.command.reload:
+    description: /cagui <reload>
     default: op
