@@ -1,8 +1,8 @@
-package io.eliotesta98.AnvilPlus.Database;
+package io.eliotesta98.CustomAnvilGUI.Database;
 
-import io.eliotesta98.AnvilPlus.Interfaces.Interface;
-import io.eliotesta98.AnvilPlus.Interfaces.ItemConfig;
-import io.eliotesta98.AnvilPlus.Utils.ColorUtils;
+import io.eliotesta98.CustomAnvilGUI.Interfaces.Interface;
+import io.eliotesta98.CustomAnvilGUI.Interfaces.ItemConfig;
+import io.eliotesta98.CustomAnvilGUI.Utils.ColorUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;

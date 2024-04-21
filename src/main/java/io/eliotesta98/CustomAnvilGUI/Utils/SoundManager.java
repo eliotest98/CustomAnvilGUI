@@ -1,4 +1,4 @@
-package io.eliotesta98.AnvilPlus.Utils;
+package io.eliotesta98.CustomAnvilGUI.Utils;
 
 import org.bukkit.Location;
 import org.bukkit.Sound;

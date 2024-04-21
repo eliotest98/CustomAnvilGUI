@@ -1,13 +1,13 @@
-package io.eliotesta98.AnvilPlus.Core;
+package io.eliotesta98.CustomAnvilGUI.Core;
 
-import io.eliotesta98.AnvilPlus.Commands.Commands;
-import io.eliotesta98.AnvilPlus.Database.ConfigGestion;
-import io.eliotesta98.AnvilPlus.Interfaces.GuiEvent;
-import io.eliotesta98.AnvilPlus.Interfaces.Interface;
-import io.eliotesta98.AnvilPlus.Utils.CommentedConfiguration;
-import io.eliotesta98.AnvilPlus.Utils.DebugUtils;
-import io.eliotesta98.AnvilPlus.Utils.Library;
-import io.eliotesta98.AnvilPlus.Utils.SoundManager;
+import io.eliotesta98.CustomAnvilGUI.Commands.Commands;
+import io.eliotesta98.CustomAnvilGUI.Database.ConfigGestion;
+import io.eliotesta98.CustomAnvilGUI.Interfaces.GuiEvent;
+import io.eliotesta98.CustomAnvilGUI.Interfaces.Interface;
+import io.eliotesta98.CustomAnvilGUI.Utils.CommentedConfiguration;
+import io.eliotesta98.CustomAnvilGUI.Utils.DebugUtils;
+import io.eliotesta98.CustomAnvilGUI.Utils.Library;
+import io.eliotesta98.CustomAnvilGUI.Utils.SoundManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -108,28 +108,8 @@ public class Main extends JavaPlugin {
         config = new ConfigGestion(YamlConfiguration.loadConfiguration(configFile));
         getServer().getConsoleSender().sendMessage("§aConfiguration Loaded!");
 
-        // RUNNABLE PER CARICARE LE DIPENDENZE ALLA FINE DELL'AVVIO DEL SERVER :D
-        getServer().getScheduler().scheduleSyncDelayedTask(this, () -> {
-            if (Bukkit.getServer().getPluginManager().isPluginEnabled("EcoEnchants")) {
-                if (getConfigGestion().getHooks().get("EcoEnchants")) {
-                    Bukkit.getServer().getConsoleSender()
-                            .sendMessage("§e[CustomGuiForAnvil] §7Added compatibility with EcoEnchants.");
-                }
-            } else {
-                getConfigGestion().getHooks().replace("EcoEnchants", false);
-            }
-            if (Bukkit.getServer().getPluginManager().isPluginEnabled("AdvancedEnchantments")) {
-                if (getConfigGestion().getHooks().get("AdvancedEnchantments")) {
-                    Bukkit.getServer().getConsoleSender()
-                            .sendMessage("§e[CustomGuiForAnvil] §7Added compatibility with AdvancedEnchantments.");
-                }
-            } else {
-                getConfigGestion().getHooks().replace("AdvancedEnchantments", false);
-            }
-        });
-
         Bukkit.getServer().getPluginManager().registerEvents(new GuiEvent(), this);
-        getCommand("anvilplus").setExecutor(new Commands());
+        getCommand("customanvilgui").setExecutor(new Commands());
 
         if (config.getDebug().get("Enabled")) {
             debugsistem.addLine("Enabled execution time= " + (System.currentTimeMillis() - tempo));
@@ -140,7 +120,7 @@ public class Main extends JavaPlugin {
     public void onDisable() {
         DebugUtils debugsistem = new DebugUtils();
         long tempo = System.currentTimeMillis();
-        Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "CustomGuiForAnvil has been disabled, §cBye bye! §e:(");
+        Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "CustomAnvilGUI has been disabled, §cBye bye! §e:(");
         for(Map.Entry<String, Interface> inventory: Main.instance.getConfigGestion().getInterfaces().entrySet()) {
             inventory.getValue().closeAllInventories();
         }

@@ -1,6 +1,6 @@
-name: AnvilPlus
+name: CustomAnvilGUI
 version: maven-version-number
-main: io.eliotesta98.AnvilPlus.Core.Main
+main: io.eliotesta98.CustomAnvilGUI.Core.Main
 api-version: 1.13
 authors: [eliotesta98, xSavior_of_God]
 softdepend: []
@@ -15,12 +15,12 @@ legacy-libraries:
 
 depend: []
 commands:
-  anvilplus:
-    aliases: [ap]
+  customanvilgui:
+    aliases: [cagui]
 permissions:
-  ap.command.help:
-    description: /ap <help>
+  cagui.command.help:
+    description: /cagui <help>
     default: op
-  ap.command.reload:
-    description: /ap <reload>
+  cagui.command.reload:
+    description: /cagui <reload>
     default: op

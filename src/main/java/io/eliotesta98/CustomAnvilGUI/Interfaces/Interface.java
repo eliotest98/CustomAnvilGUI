@@ -1,7 +1,7 @@
-package io.eliotesta98.AnvilPlus.Interfaces;
+package io.eliotesta98.CustomAnvilGUI.Interfaces;
 
-import io.eliotesta98.AnvilPlus.Core.Main;
-import io.eliotesta98.AnvilPlus.Utils.ColorUtils;
+import io.eliotesta98.CustomAnvilGUI.Core.Main;
+import io.eliotesta98.CustomAnvilGUI.Utils.ColorUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -16,14 +16,14 @@ public class Interface {
 
     private String title, soundOpen, nameInterface, nameInterfaceToOpen, nameInterfaceToReturn;
     private ArrayList<String> slots = new ArrayList<>();
-    private HashMap<String, io.eliotesta98.AnvilPlus.Interfaces.ItemConfig> itemsConfig = new HashMap<>();
+    private HashMap<String, io.eliotesta98.CustomAnvilGUI.Interfaces.ItemConfig> itemsConfig = new HashMap<>();
     private boolean debug;
     private int sizeModificableSlot;
     private final Map<String, InventoryView> anvilInventories = new HashMap<>();
     private final Map<String, Integer> importantSlots = new HashMap<>();
     private final Map<String, String> importantSlotsLetter = new HashMap<>();
 
-    public Interface(String title, String soundOpen, ArrayList<String> slots, HashMap<String, io.eliotesta98.AnvilPlus.Interfaces.ItemConfig> itemsConfig, boolean debug, int sizeModificableSlot, String nameInterface, String nameInterfaceToOpen, String nameInterfaceToReturn) {
+    public Interface(String title, String soundOpen, ArrayList<String> slots, HashMap<String, io.eliotesta98.CustomAnvilGUI.Interfaces.ItemConfig> itemsConfig, boolean debug, int sizeModificableSlot, String nameInterface, String nameInterfaceToOpen, String nameInterfaceToReturn) {
         this.title = title;
         this.soundOpen = soundOpen;
         this.itemsConfig.putAll(itemsConfig);
@@ -59,11 +59,11 @@ public class Interface {
         this.slots = slots;
     }
 
-    public HashMap<String, io.eliotesta98.AnvilPlus.Interfaces.ItemConfig> getItemsConfig() {
+    public HashMap<String, io.eliotesta98.CustomAnvilGUI.Interfaces.ItemConfig> getItemsConfig() {
         return itemsConfig;
     }
 
-    public void setItemsConfig(HashMap<String, io.eliotesta98.AnvilPlus.Interfaces.ItemConfig> itemsConfig) {
+    public void setItemsConfig(HashMap<String, io.eliotesta98.CustomAnvilGUI.Interfaces.ItemConfig> itemsConfig) {
         this.itemsConfig = itemsConfig;
     }
 
@@ -141,7 +141,7 @@ public class Interface {
             if (player == null) {
                 continue;
             }
-            if (inventory.getValue().getPlayer().getOpenInventory().getTopInventory().getHolder() instanceof CustomGuiForAnvil) {
+            if (inventory.getValue().getPlayer().getOpenInventory().getTopInventory().getHolder() instanceof CustomAnvilGUIHolder) {
                 removeInventory(player.getName(), inventory.getValue().getPlayer().getOpenInventory().getTopInventory(), player.getLocation(), false);
             }
             player.closeInventory();
@@ -181,7 +181,7 @@ public class Interface {
     }
 
     private Inventory getCustomAnvilInventory() {
-        CustomGuiForAnvil holder = new CustomGuiForAnvil(this.getSlots().size(), ColorUtils.applyColor(this.getTitle()));
+        CustomAnvilGUIHolder holder = new CustomAnvilGUIHolder(this.getSlots().size(), ColorUtils.applyColor(this.getTitle()));
         // prendo l'inventario
         final Inventory inventory = holder.getInventory();
 

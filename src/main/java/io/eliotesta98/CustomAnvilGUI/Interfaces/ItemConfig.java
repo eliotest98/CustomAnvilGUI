@@ -1,9 +1,9 @@
-package io.eliotesta98.AnvilPlus.Interfaces;
+package io.eliotesta98.CustomAnvilGUI.Interfaces;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import de.tr7zw.nbtapi.NBTItem;
-import io.eliotesta98.AnvilPlus.Utils.ColorUtils;
+import io.eliotesta98.CustomAnvilGUI.Utils.ColorUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;

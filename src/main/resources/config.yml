@@ -5,10 +5,6 @@
 #                                                                                               #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-Configuration:
-  # Set whether various plugins should be hooked into (i will also check if is enabled).
-  Hooks: {}
-
 Interface:
   Anvil:
     Title: "&aAnvil"
