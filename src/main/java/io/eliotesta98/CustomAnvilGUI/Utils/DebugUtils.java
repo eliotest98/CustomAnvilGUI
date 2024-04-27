@@ -65,6 +65,7 @@ public class DebugUtils {
 		debug = " Close Debug CubeGenerator for " + type;
 		Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.YELLOW + debug);
 		Bukkit.getServer().getConsoleSender().sendMessage(" ");
+		removeAll();
 	}
 
 }

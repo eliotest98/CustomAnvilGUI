@@ -24,9 +24,9 @@ public class ConfigGestion {
             debug.put(event, file.getBoolean("Debug." + event));
         }
 
-        for (String hook : file.getConfigurationSection("Configuration.Hooks").getKeys(false)) {
-            hooks.put(hook, file.getBoolean("Configuration.Hooks." + hook));
-        }
+//        for (String hook : file.getConfigurationSection("Configuration.Hooks").getKeys(false)) {
+//            hooks.put(hook, file.getBoolean("Configuration.Hooks." + hook));
+//        }
 
         String prefix = "";
         for (String message : file.getConfigurationSection("Messages").getKeys(false)) {

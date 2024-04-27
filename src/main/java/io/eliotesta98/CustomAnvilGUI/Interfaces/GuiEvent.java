@@ -30,6 +30,7 @@ public class GuiEvent implements Listener {
     private final boolean debugGui = Main.instance.getConfigGestion().getDebug().get("ClickGui");
     private final String insufficientExp = Main.instance.getConfigGestion().getMessages().get("Errors.InsufficientExperience");
     private final List<String> whitelistedPlayers = new ArrayList<>();
+    private final DebugUtils debugUtils = new DebugUtils();
 
     @EventHandler
     public void onAnvilInventoryOpen(InventoryOpenEvent event) {
@@ -86,8 +87,6 @@ public class GuiEvent implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        DebugUtils debugUtils = new DebugUtils();
-
         Inventory inv = event.getClickedInventory();
 
         if (inv == null) {
@@ -134,19 +133,30 @@ public class GuiEvent implements Listener {
                     inventoryView.getTopInventory().setItem(1, null);
                     whitelistedPlayers.add(p.getName());
                     Main.instance.getConfigGestion().getInterfaces().get("Anvil").removeInventory(p.getName(), event.getClickedInventory(), p.getLocation(), true);
-                    p.openInventory(inventoryView);
-                } else if (nameItemConfig.equalsIgnoreCase("Confirm")) {
-                    inventoryView.getTopInventory().setItem(0,
-                            inv.getItem(Main.instance.getConfigGestion().getInterfaces().get("Anvil")
-                                    .getImportantSlots().get("Item")));
-                    inventoryView.getTopInventory().setItem(1,
-                            inv.getItem(Main.instance.getConfigGestion().getInterfaces().get("Anvil")
-                                    .getImportantSlots().get("Enchant")));
+                    try {
+                        p.openInventory(inventoryView);
+                    } catch (IllegalArgumentException ignore) {
+
+                    }
+                } else if (nameItemConfig.equalsIgnoreCase("Submit")) {
+                    inventoryView.getTopInventory().clear();
+                    ItemStack firstItem = inv.getItem(Main.instance.getConfigGestion().getInterfaces().get("Anvil")
+                            .getImportantSlots().get("FirstItem"));
+                    if (firstItem == null) {
+                        firstItem = new ItemStack(Material.AIR);
+                    }
+                    ItemStack secondItem = inv.getItem(Main.instance.getConfigGestion().getInterfaces().get("Anvil")
+                            .getImportantSlots().get("SecondItem"));
+                    if (secondItem == null) {
+                        secondItem = new ItemStack(Material.AIR);
+                    }
+                    inventoryView.getTopInventory().setItem(0, firstItem);
+                    inventoryView.getTopInventory().setItem(1, secondItem);
                 }
                 event.setCancelled(true);
                 if (debugGui) {
                     debugUtils.addLine("The item is not null");
-                    debugUtils.addLine("The item is equals configurated in config.yml");
+                    debugUtils.addLine("The item is equals configuration in config.yml");
                     debugUtils.debug("Click Gui");
                 }
             } else if (event.getCurrentItem() != null) {
@@ -160,23 +170,24 @@ public class GuiEvent implements Listener {
                     event.setCancelled(true);
                 }
                 // Item
-                else if (nameItemConfig.equalsIgnoreCase("Item")) {
+                else if (nameItemConfig.equalsIgnoreCase("FirstItem")) {
                     customInterface.deleteResult(inv);
                     inventoryView.getTopInventory().setItem(0, null);
                 }
                 // Enchant
-                else if (nameItemConfig.equalsIgnoreCase("Enchant")) {
+                else if (nameItemConfig.equalsIgnoreCase("SecondItem")) {
                     customInterface.deleteResult(inv);
                     inventoryView.getTopInventory().setItem(1, null);
                 }
                 // Result
-                else if (nameItemConfig.equalsIgnoreCase("Result")) {
+                else if (nameItemConfig.equalsIgnoreCase("NoResult")) {
+                    event.setCancelled(true);
                     int repairCost = 0;
-                    if (event.getCurrentItem() != null) {
+                    if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR) {
                         NBTItem nbtItem = new NBTItem(event.getCurrentItem());
                         repairCost = nbtItem.getInteger("ap.repairCost");
                     }
-                    int slotResult = customInterface.getImportantSlots().get("Result");
+                    int slotResult = customInterface.getImportantSlots().get("NoResult");
                     ItemStack result = inv.getItem(slotResult);
                     int experienceRaw = ExpUtils.getExp(p);
                     double levels = ExpUtils.getLevelFromExp(experienceRaw);
@@ -188,17 +199,13 @@ public class GuiEvent implements Listener {
                             } else {
                                 p.getWorld().dropItem(p.getLocation(), result);
                             }
-                            inv.setItem(event.getSlot(), null);
+                            customInterface.setBarrier(inv);
                             customInterface.setBorder(inv, customInterface.getImportantSlots().get("Cost"));
                             customInterface.deleteItemsWhenResult(inv);
-
-                            event.setCancelled(true);
-
                             damageAnvil(anvilLocation);
                         }
                     } else {
                         p.sendMessage(ColorUtils.applyColor(insufficientExp));
-                        event.setCancelled(true);
                     }
                 }
             }
@@ -211,15 +218,22 @@ public class GuiEvent implements Listener {
             Interface interface_ = Main.instance.getConfigGestion().getInterfaces().get("Anvil");
             AnvilInventory anvil = event.getInventory();
 
+            if (debugGui) {
+                debugUtils.addLine("Custom Anvil Gui");
+                debugUtils.addLine("Repair Cost: " + anvil.getRepairCost());
+                debugUtils.addLine("Item Result: " + event.getResult());
+                debugUtils.debug("PrepareAnvilEvent");
+            }
+
             if (anvil.getRepairCost() > 0) {
-                if (event.getResult() != null) {
+                if (event.getResult() != null && event.getResult().getType() != Material.AIR) {
                     interface_.setCostOfEnchant(
                             event.getView().getPlayer().getOpenInventory().getTopInventory(), anvil.getRepairCost());
 
                     NBTItem nbtItem = new NBTItem(event.getResult());
                     nbtItem.setInteger("ap.repairCost", anvil.getRepairCost());
                     event.getView().getPlayer().getOpenInventory().getTopInventory().setItem(
-                            interface_.getImportantSlots().get("Result"), nbtItem.getItem());
+                            interface_.getImportantSlots().get("NoResult"), nbtItem.getItem());
                 }
             } else {
                 interface_.deleteResult(event.getView().getPlayer().getOpenInventory().getTopInventory());
@@ -239,6 +253,21 @@ public class GuiEvent implements Listener {
                 blockData = (Directional) anvilLocation.getBlock().getBlockData();
                 blockData.setFacing(blockFace);
                 anvilLocation.getBlock().setBlockData(blockData);
+//                try {
+//                    org.bukkit.block.data.Directional blockData = (org.bukkit.block.data.Directional) anvilLocation.getBlock().getBlockData();
+//                    BlockFace blockFace = blockData.getFacing();
+//                    anvilLocation.getBlock().setType(Material.CHIPPED_ANVIL);
+//                    blockData = (org.bukkit.block.data.Directional) anvilLocation.getBlock().getBlockData();
+//                    blockData.setFacing(blockFace);
+//                    anvilLocation.getBlock().setBlockData(blockData);
+//                } catch (NoClassDefFoundError error) {
+//                    org.bukkit.material.Directional blockData = (org.bukkit.material.Directional) anvilLocation.getBlock().getState().getData();
+//                    BlockFace blockFace = blockData.getFacing();
+//                    anvilLocation.getBlock().setType(Material.ANVIL);
+//                    blockData = (org.bukkit.material.Directional) anvilLocation.getBlock().getState().getData();
+//                    blockData.setFacingDirection(blockFace);
+//                    ((org.bukkit.material.Directional) anvilLocation.getBlock().getState().getData()).setFacingDirection(blockFace);
+//                }
                 SoundManager.playSound(anvilLocation, Sound.BLOCK_ANVIL_USE, 100f, 100f);
             } else if (anvilType == Material.CHIPPED_ANVIL) {
                 Directional blockData = (Directional) anvilLocation.getBlock().getBlockData();
@@ -247,6 +276,21 @@ public class GuiEvent implements Listener {
                 blockData = (Directional) anvilLocation.getBlock().getBlockData();
                 blockData.setFacing(blockFace);
                 anvilLocation.getBlock().setBlockData(blockData);
+//                try {
+//                    org.bukkit.block.data.Directional blockData = (org.bukkit.block.data.Directional) anvilLocation.getBlock().getBlockData();
+//                    BlockFace blockFace = blockData.getFacing();
+//                    anvilLocation.getBlock().setType(Material.DAMAGED_ANVIL);
+//                    blockData = (org.bukkit.block.data.Directional) anvilLocation.getBlock().getBlockData();
+//                    blockData.setFacing(blockFace);
+//                    anvilLocation.getBlock().setBlockData(blockData);
+//                } catch (NoClassDefFoundError error) {
+//                    org.bukkit.material.Directional blockData = (org.bukkit.material.Directional) anvilLocation.getBlock().getState().getData();
+//                    BlockFace blockFace = blockData.getFacing();
+//                    anvilLocation.getBlock().setType(Material.DAMAGED_ANVIL);
+//                    blockData = (org.bukkit.material.Directional) anvilLocation.getBlock().getState().getData();
+//                    blockData.setFacingDirection(blockFace);
+//                    ((org.bukkit.material.Directional) anvilLocation.getBlock().getState().getData()).setFacingDirection(blockFace);
+//                }
                 SoundManager.playSound(anvilLocation, Sound.BLOCK_ANVIL_USE, 100f, 100f);
             } else if (anvilType == Material.DAMAGED_ANVIL) {
                 anvilLocation.getBlock().setType(Material.AIR);
