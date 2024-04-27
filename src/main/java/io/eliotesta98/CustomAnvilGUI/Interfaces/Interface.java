@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -175,8 +176,12 @@ public class Interface {
     public void deleteResult(Inventory inventory) {
         int slotCost = importantSlots.get("Cost");
         setBorder(inventory, slotCost);
-        int slotResult = importantSlots.get("Result");
-        inventory.setItem(slotResult, null);
+        setBarrier(inventory);
+    }
+
+    public void setBarrier(Inventory inventory) {
+        int slotResult = importantSlots.get("NoResult");
+        inventory.setItem(slotResult, this.getItemsConfig().get(importantSlotsLetter.get("NoResult")).createItemConfig(this.getNameInterface(), "", slotResult));
     }
 
     private Inventory getCustomAnvilInventory() {
@@ -196,9 +201,10 @@ public class Interface {
                 } else if (this.itemsConfig.get(slot).getNameItemConfig().equalsIgnoreCase("SecondItem")) {
                     importantSlots.putIfAbsent(this.itemsConfig.get(slot).getNameItemConfig(), i);
                     importantSlotsLetter.putIfAbsent(this.itemsConfig.get(slot).getNameItemConfig(), slot);
-                } else if (this.itemsConfig.get(slot).getNameItemConfig().equalsIgnoreCase("Result")) {
+                } else if (this.itemsConfig.get(slot).getNameItemConfig().equalsIgnoreCase("NoResult")) {
                     importantSlots.putIfAbsent(this.itemsConfig.get(slot).getNameItemConfig(), i);
                     importantSlotsLetter.putIfAbsent(this.itemsConfig.get(slot).getNameItemConfig(), slot);
+                    inventory.setItem(i, this.getItemsConfig().get(slot).createItemConfig(this.getNameInterface(), "", i));
                 } else if (this.itemsConfig.get(slot).getNameItemConfig().equalsIgnoreCase("Cost")) {
                     importantSlots.putIfAbsent(this.itemsConfig.get(slot).getNameItemConfig(), i);
                     importantSlotsLetter.putIfAbsent(this.itemsConfig.get(slot).getNameItemConfig(), slot);
