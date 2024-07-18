@@ -13,6 +13,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static io.eliotesta98.CustomAnvilGUI.Interfaces.GuiEvent.getOpenInventoryView;
+import static io.eliotesta98.CustomAnvilGUI.Interfaces.GuiEvent.getTopInventory;
+
 public class Interface {
     private String title, soundOpen, nameInterface, nameInterfaceToOpen, nameInterfaceToReturn;
     private ArrayList<String> slots = new ArrayList<>();
@@ -141,8 +144,8 @@ public class Interface {
             if (player == null) {
                 continue;
             }
-            if (inventory.getValue().getPlayer().getOpenInventory().getTopInventory().getHolder() instanceof CustomAnvilGUIHolder) {
-                removeInventory(player.getName(), inventory.getValue().getPlayer().getOpenInventory().getTopInventory(), player.getLocation(), false);
+            if (getTopInventory(getOpenInventoryView(inventory.getValue())).getHolder() instanceof CustomAnvilGUIHolder) {
+                removeInventory(player.getName(), getTopInventory(getOpenInventoryView(inventory.getValue())), player.getLocation(), false);
             }
             player.closeInventory();
         }

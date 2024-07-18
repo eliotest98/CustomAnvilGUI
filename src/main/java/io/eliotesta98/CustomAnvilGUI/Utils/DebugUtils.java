@@ -54,7 +54,7 @@ public class DebugUtils {
 	}
 
 	public void debug(String type) {
-		String debug = " Debug CubeGenerator for " + type;
+		String debug = " Debug CustomAnvilGUI for " + type;
 		Bukkit.getServer().getConsoleSender().sendMessage(" ");
 		Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.YELLOW + debug);
 		Bukkit.getServer().getConsoleSender().sendMessage(" ");
@@ -62,7 +62,7 @@ public class DebugUtils {
 			Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.RED + this.getLine(i));
 		}
 		Bukkit.getServer().getConsoleSender().sendMessage(" ");
-		debug = " Close Debug CubeGenerator for " + type;
+		debug = " Close Debug CustomAnvilGUI for " + type;
 		Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.YELLOW + debug);
 		Bukkit.getServer().getConsoleSender().sendMessage(" ");
 		removeAll();

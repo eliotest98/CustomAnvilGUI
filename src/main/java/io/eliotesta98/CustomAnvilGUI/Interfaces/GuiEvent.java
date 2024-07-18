@@ -11,6 +11,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Directional;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,6 +24,8 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 
 public class GuiEvent implements Listener {
@@ -31,6 +34,45 @@ public class GuiEvent implements Listener {
     private final String insufficientExp = Main.instance.getConfigGestion().getMessages().get("Errors.InsufficientExperience");
     private final List<String> whitelistedPlayers = new ArrayList<>();
     private final DebugUtils debugUtils = new DebugUtils();
+
+    /**
+     * In API versions 1.20.6 and earlier, InventoryView is a class.
+     * In versions 1.21 and later, it is an interface.
+     * This method uses reflection to get the top Inventory object from the
+     * InventoryView associated with an InventoryEvent, to avoid runtime errors.
+     *
+     * @param inventoryView The generic InventoryView with an InventoryView to inspect.
+     * @return The top Inventory object from the event's InventoryView.
+     */
+    public static Inventory getTopInventory(InventoryView inventoryView) {
+        try {
+            Method getTopInventory = ((Object) inventoryView).getClass().getMethod("getTopInventory");
+            getTopInventory.setAccessible(true);
+            return (Inventory) getTopInventory.invoke(inventoryView);
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * In API versions 1.20.6 and earlier, InventoryView is a class.
+     * In versions 1.21 and later, it is an interface.
+     * This method uses reflection to get the OpenInventory object from the
+     * InventoryView associated with an InventoryEvent, to avoid runtime errors.
+     *
+     * @param inventoryView The generic InventoryView with an InventoryView to inspect.
+     * @return The Open Inventory object from the event's InventoryView.
+     */
+    public static InventoryView getOpenInventoryView(InventoryView inventoryView) {
+        try {
+            Method getPlayer = ((Object) inventoryView).getClass().getMethod("getPlayer");
+            getPlayer.setAccessible(true);
+            HumanEntity humanEntity = (HumanEntity) getPlayer.invoke(inventoryView);
+            return humanEntity.getOpenInventory();
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @EventHandler
     public void onAnvilInventoryOpen(InventoryOpenEvent event) {
@@ -62,8 +104,8 @@ public class GuiEvent implements Listener {
         DebugUtils debug = new DebugUtils();
         long time = System.currentTimeMillis();
 
-        if (event.getPlayer().getOpenInventory().getTopInventory().getHolder() instanceof CustomAnvilGUIHolder) {
-            Main.instance.getConfigGestion().getInterfaces().get("Anvil").removeInventory(event.getPlayer().getName(), event.getPlayer().getOpenInventory().getTopInventory(), event.getPlayer().getLocation(), true);
+        if (getTopInventory(event.getPlayer().getOpenInventory()).getHolder() instanceof CustomAnvilGUIHolder) {
+            Main.instance.getConfigGestion().getInterfaces().get("Anvil").removeInventory(event.getPlayer().getName(), getTopInventory(event.getPlayer().getOpenInventory()), event.getPlayer().getLocation(), true);
         }
         if (debugGui) {
             debug.addLine("Gui execution time= " + (System.currentTimeMillis() - time));
@@ -76,8 +118,8 @@ public class GuiEvent implements Listener {
         DebugUtils debug = new DebugUtils();
         long time = System.currentTimeMillis();
 
-        if (event.getPlayer().getOpenInventory().getTopInventory().getHolder() instanceof CustomAnvilGUIHolder) {
-            Main.instance.getConfigGestion().getInterfaces().get("Anvil").removeInventory(event.getPlayer().getName(), event.getPlayer().getOpenInventory().getTopInventory(), event.getPlayer().getLocation(), true);
+        if (getTopInventory(event.getPlayer().getOpenInventory()).getHolder() instanceof CustomAnvilGUIHolder) {
+            Main.instance.getConfigGestion().getInterfaces().get("Anvil").removeInventory(event.getPlayer().getName(), getTopInventory(event.getPlayer().getOpenInventory()), event.getPlayer().getLocation(), true);
         }
         if (debugGui) {
             debug.addLine("Gui execution time= " + (System.currentTimeMillis() - time));
@@ -111,7 +153,7 @@ public class GuiEvent implements Listener {
                 return;
             }
 
-            Location anvilLocation = inventoryView.getTopInventory().getLocation();
+            Location anvilLocation = getTopInventory(inventoryView).getLocation();
             Material anvilType = anvilLocation.getBlock().getType();
             if (anvilType != Material.ANVIL && anvilType != Material.DAMAGED_ANVIL && anvilType != Material.CHIPPED_ANVIL) {
                 p.closeInventory();
@@ -129,8 +171,8 @@ public class GuiEvent implements Listener {
             if (event.getCurrentItem() != null && customInterface.getItemsConfig().get(slots.get(event.getSlot())).getType().equalsIgnoreCase(event.getCurrentItem().getType().toString())) {
                 if (nameItemConfig.equalsIgnoreCase("Back")) {
                     p.closeInventory();
-                    inventoryView.getTopInventory().setItem(0, null);
-                    inventoryView.getTopInventory().setItem(1, null);
+                    getTopInventory(inventoryView).setItem(0, null);
+                    getTopInventory(inventoryView).setItem(1, null);
                     whitelistedPlayers.add(p.getName());
                     Main.instance.getConfigGestion().getInterfaces().get("Anvil").removeInventory(p.getName(), event.getClickedInventory(), p.getLocation(), true);
                     try {
@@ -139,7 +181,7 @@ public class GuiEvent implements Listener {
 
                     }
                 } else if (nameItemConfig.equalsIgnoreCase("Submit")) {
-                    inventoryView.getTopInventory().clear();
+                    getTopInventory(inventoryView).clear();
                     ItemStack firstItem = inv.getItem(Main.instance.getConfigGestion().getInterfaces().get("Anvil")
                             .getImportantSlots().get("FirstItem"));
                     if (firstItem == null) {
@@ -150,8 +192,8 @@ public class GuiEvent implements Listener {
                     if (secondItem == null) {
                         secondItem = new ItemStack(Material.AIR);
                     }
-                    inventoryView.getTopInventory().setItem(0, firstItem);
-                    inventoryView.getTopInventory().setItem(1, secondItem);
+                    getTopInventory(inventoryView).setItem(0, firstItem);
+                    getTopInventory(inventoryView).setItem(1, secondItem);
                 }
                 event.setCancelled(true);
                 if (debugGui) {
@@ -172,12 +214,12 @@ public class GuiEvent implements Listener {
                 // Item
                 else if (nameItemConfig.equalsIgnoreCase("FirstItem")) {
                     customInterface.deleteResult(inv);
-                    inventoryView.getTopInventory().setItem(0, null);
+                    getTopInventory(inventoryView).setItem(0, null);
                 }
                 // Enchant
                 else if (nameItemConfig.equalsIgnoreCase("SecondItem")) {
                     customInterface.deleteResult(inv);
-                    inventoryView.getTopInventory().setItem(1, null);
+                    getTopInventory(inventoryView).setItem(1, null);
                 }
                 // Result
                 else if (nameItemConfig.equalsIgnoreCase("NoResult")) {
@@ -214,7 +256,7 @@ public class GuiEvent implements Listener {
 
     @EventHandler
     public void onInventoryPrepareAnvilEvent(PrepareAnvilEvent event) {
-        if (event.getView().getPlayer().getOpenInventory().getTopInventory().getHolder() instanceof CustomAnvilGUIHolder) {
+        if (getTopInventory(getOpenInventoryView(event.getView())).getHolder() instanceof CustomAnvilGUIHolder) {
             Interface interface_ = Main.instance.getConfigGestion().getInterfaces().get("Anvil");
             AnvilInventory anvil = event.getInventory();
 
@@ -228,15 +270,15 @@ public class GuiEvent implements Listener {
             if (anvil.getRepairCost() > 0) {
                 if (event.getResult() != null && event.getResult().getType() != Material.AIR) {
                     interface_.setCostOfEnchant(
-                            event.getView().getPlayer().getOpenInventory().getTopInventory(), anvil.getRepairCost());
+                            getTopInventory(getOpenInventoryView(event.getView())), anvil.getRepairCost());
 
                     NBTItem nbtItem = new NBTItem(event.getResult());
                     nbtItem.setInteger("ap.repairCost", anvil.getRepairCost());
-                    event.getView().getPlayer().getOpenInventory().getTopInventory().setItem(
+                    getTopInventory(getOpenInventoryView(event.getView())).setItem(
                             interface_.getImportantSlots().get("NoResult"), nbtItem.getItem());
                 }
             } else {
-                interface_.deleteResult(event.getView().getPlayer().getOpenInventory().getTopInventory());
+                interface_.deleteResult(getTopInventory(getOpenInventoryView(event.getView())));
             }
         }
     }
