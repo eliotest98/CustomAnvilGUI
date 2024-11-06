@@ -4,6 +4,7 @@ import io.eliotesta98.CustomAnvilGUI.Core.Main;
 import io.eliotesta98.CustomAnvilGUI.Utils.ColorUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
@@ -121,7 +122,7 @@ public class Interface {
         }
         int enchantSlot = customInterface.getImportantSlots().get("SecondItem");
         ItemStack enchantedBook = inventory.getItem(enchantSlot);
-        if (enchantedBook != null) {
+        if (enchantedBook != null && enchantedBook.getType() != Material.PAPER) {
             dropLocation.getWorld().dropItem(dropLocation, enchantedBook);
         }
         anvilInventories.remove(playerName);
@@ -141,8 +142,8 @@ public class Interface {
             if (player == null) {
                 continue;
             }
-            if (inventory.getValue().getPlayer().getOpenInventory().getTopInventory().getHolder() instanceof CustomAnvilGUIHolder) {
-                removeInventory(player.getName(), inventory.getValue().getPlayer().getOpenInventory().getTopInventory(), player.getLocation(), false);
+            if (inventory.getValue().getTopInventory().getHolder() instanceof CustomAnvilGUIHolder) {
+                removeInventory(player.getName(), inventory.getValue().getTopInventory(), player.getLocation(), false);
             }
             player.closeInventory();
         }

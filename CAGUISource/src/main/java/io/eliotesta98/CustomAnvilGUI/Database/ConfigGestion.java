@@ -37,21 +37,17 @@ public class ConfigGestion {
             } else if (message.equalsIgnoreCase("Prefix")) {
                 prefix = file.getString("Messages." + message);
                 messages.put(message, prefix);
-            } else if (message.equalsIgnoreCase("Success")) {
-                for (String success : file.getConfigurationSection("Messages.Success").getKeys(false)) {
-                    messages.put(message + "." + success, file.getString("Messages.Success." + success).replace("{prefix}", prefix));
-                }
             } else if (message.equalsIgnoreCase("Lists")) {
                 for (String success : file.getConfigurationSection("Messages.Lists").getKeys(false)) {
                     messages.put(message + "." + success, file.getString("Messages.Lists." + success).replace("{prefix}", prefix));
                 }
-            } else if (message.equalsIgnoreCase("Warnings")) {
-                for (String success : file.getConfigurationSection("Messages.Warnings").getKeys(false)) {
-                    messages.put(message + "." + success, file.getString("Messages.Warnings." + success).replace("{prefix}", prefix));
-                }
-            } else if (message.equalsIgnoreCase("Errors")) {
-                for (String success : file.getConfigurationSection("Messages.Errors").getKeys(false)) {
-                    messages.put(message + "." + success, file.getString("Messages.Errors." + success).replace("{prefix}", prefix));
+            } else if (message.equalsIgnoreCase("Warnings")
+                    || message.equalsIgnoreCase("Errors")
+                    || message.equalsIgnoreCase("Success")
+                    || message.equalsIgnoreCase("Info")
+            ) {
+                for (String success : file.getConfigurationSection("Messages." + message).getKeys(false)) {
+                    messages.put(message + "." + success, file.getString("Messages." + message + "." + success).replace("{prefix}", prefix));
                 }
             } else {
                 messages.put(message, file.getString("Messages." + message).replace("{prefix}", prefix));

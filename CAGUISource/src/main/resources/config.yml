@@ -58,7 +58,7 @@ Interface:
         SoundClick: ''
       Rename:
         Letter: 'n'
-        Name: 'Coming Soon...'
+        Name: '&2>&e&l> &a&lRename <&2<'
         Type: 'NAME_TAG'
         Texture: ''
         Lore: [ ]
@@ -79,9 +79,12 @@ Messages:
     Footer: '&7(&7&l(&c&l!&7&l)&7) &9[] optional value, <> required'
     Reload: '   &e/cagui &6<reload> &7for reload CustomGuiForAnvil plugin'
     Help: '   &e/cagui &6<help> &7for help commands'
-  Success: {}
+  Success:
+    Rename: '{prefix}&aTool name has been successfully registered, please now reopen the anvil'
   Lists: {}
   Warnings: {}
+  Info:
+    Rename: '{prefix}&7Please write the name of your tool in chat'
   Errors:
     NoPlayer: '{prefix}&cYou are not a player'
     CommandNotFound: '{prefix}&cCommand not found'
