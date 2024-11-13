@@ -142,8 +142,9 @@ public class Interface {
             if (player == null) {
                 continue;
             }
-            if (inventory.getValue().getTopInventory().getHolder() instanceof CustomAnvilGUIHolder) {
-                removeInventory(player.getName(), inventory.getValue().getTopInventory(), player.getLocation(), false);
+            Inventory topInventory = GuiEvent.getTopInventory(inventory.getValue());
+            if (topInventory.getHolder() instanceof CustomAnvilGUIHolder) {
+                removeInventory(player.getName(), topInventory, player.getLocation(), false);
             }
             player.closeInventory();
         }

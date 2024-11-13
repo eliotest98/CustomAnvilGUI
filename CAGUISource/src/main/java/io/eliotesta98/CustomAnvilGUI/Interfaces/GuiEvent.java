@@ -6,20 +6,15 @@ import io.eliotesta98.CustomAnvilGUI.Event.PlayerWriteEvent;
 import io.eliotesta98.CustomAnvilGUI.Utils.ColorUtils;
 import io.eliotesta98.CustomAnvilGUI.Utils.DebugUtils;
 import io.eliotesta98.CustomAnvilGUI.Utils.ExpUtils;
-import io.eliotesta98.CustomAnvilGUI.Utils.SoundManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Directional;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.inventory.PrepareAnvilEvent;
+import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
@@ -27,6 +22,8 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -93,6 +90,25 @@ public class GuiEvent implements Listener {
         }
     }
 
+    /*
+     * In API versions 1.20.6 and earlier, InventoryView is a class.
+     * In versions 1.21 and later, it is an interface.
+     * This method uses reflection to get the top Inventory object from the
+     * InventoryView associated with an InventoryEvent, to avoid runtime errors.
+     *
+     * @param view The generic InventoryView.
+     * @return The top Inventory object from the event's InventoryView.
+     */
+    public static Inventory getTopInventory(Object view) {
+        try {
+            Method getTopInventory = view.getClass().getMethod("getTopInventory");
+            getTopInventory.setAccessible(true);
+            return (Inventory) getTopInventory.invoke(view);
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         Inventory inv = event.getClickedInventory();
@@ -118,8 +134,8 @@ public class GuiEvent implements Listener {
                 }
                 return;
             }
-
-            Location anvilLocation = inventoryView.getTopInventory().getLocation();
+            Inventory topInventory = getTopInventory(inventoryView);
+            Location anvilLocation = topInventory.getLocation();
             Material anvilType = anvilLocation.getBlock().getType();
             if (anvilType != Material.ANVIL && anvilType != Material.DAMAGED_ANVIL && anvilType != Material.CHIPPED_ANVIL) {
                 p.closeInventory();
@@ -139,8 +155,8 @@ public class GuiEvent implements Listener {
                 // Back
                 if (nameItemConfig.equalsIgnoreCase("Back")) {
                     p.closeInventory();
-                    inventoryView.getTopInventory().setItem(0, null);
-                    inventoryView.getTopInventory().setItem(1, null);
+                    topInventory.setItem(0, null);
+                    topInventory.setItem(1, null);
                     whitelistedPlayers.add(p.getName());
                     Main.instance.getConfigGestion().getInterfaces().get("Anvil").removeInventory(p.getName(), event.getClickedInventory(), p.getLocation(), true);
                     try {
@@ -151,7 +167,7 @@ public class GuiEvent implements Listener {
                 }
                 // Submit
                 else if (nameItemConfig.equalsIgnoreCase("Submit")) {
-                    inventoryView.getTopInventory().clear();
+                    topInventory.clear();
                     ItemStack firstItem = inv.getItem(Main.instance.getConfigGestion().getInterfaces().get("Anvil")
                             .getImportantSlots().get("FirstItem"));
                     if (firstItem == null) {
@@ -172,8 +188,8 @@ public class GuiEvent implements Listener {
                         inv.setItem(Main.instance.getConfigGestion().getInterfaces().get("Anvil").getImportantSlots().get("NoResult"), nbtItem.getItem());
                         return;
                     }
-                    inventoryView.getTopInventory().setItem(0, firstItem);
-                    inventoryView.getTopInventory().setItem(1, secondItem);
+                    topInventory.setItem(0, firstItem);
+                    topInventory.setItem(1, secondItem);
                 }
                 // Rename
                 else if (nameItemConfig.equalsIgnoreCase("Rename")) {
@@ -205,29 +221,32 @@ public class GuiEvent implements Listener {
                     debugUtils.addLine("Activate Section:" + nameItemConfig);
                     debugUtils.debug("Click Gui");
                 }
+
+                ItemStack firstItem = inv.getItem(Main.instance.getConfigGestion().getInterfaces().get("Anvil").getImportantSlots().get("SecondItem"));
+
                 // Cost
                 if (nameItemConfig.equalsIgnoreCase("Cost")) {
                     event.setCancelled(true);
                 }
                 // First Item (Rename)
-                else if (nameItemConfig.equalsIgnoreCase("FirstItem") && inv.getItem(Main.instance.getConfigGestion().getInterfaces().get("Anvil").getImportantSlots().get("SecondItem")).getType() == Material.PAPER) {
+                else if (nameItemConfig.equalsIgnoreCase("FirstItem") && firstItem != null && firstItem.getType() == Material.PAPER) {
                     customInterface.setBarrier(inv);
                     customInterface.setBorder(inv, customInterface.getImportantSlots().get("Cost"));
                 }
                 // Item
                 else if (nameItemConfig.equalsIgnoreCase("FirstItem")) {
                     customInterface.deleteResult(inv);
-                    inventoryView.getTopInventory().setItem(0, null);
+                    topInventory.setItem(0, null);
                 }
                 // Second Item (Rename)
-                else if (nameItemConfig.equalsIgnoreCase("SecondItem") && inv.getItem(Main.instance.getConfigGestion().getInterfaces().get("Anvil").getImportantSlots().get("SecondItem")).getType() == Material.PAPER) {
+                else if (nameItemConfig.equalsIgnoreCase("SecondItem") && firstItem != null && firstItem.getType() == Material.PAPER) {
                     event.setCancelled(true);
                     inv.setItem(event.getSlot(), null);
                 }
                 // Enchant
                 else if (nameItemConfig.equalsIgnoreCase("SecondItem")) {
                     customInterface.deleteResult(inv);
-                    inventoryView.getTopInventory().setItem(1, null);
+                    topInventory.setItem(1, null);
                 }
                 // Result
                 else if (nameItemConfig.equalsIgnoreCase("NoResult")) {
@@ -262,30 +281,63 @@ public class GuiEvent implements Listener {
         }
     }
 
+    /*
+     * In API versions 1.20.6 and earlier, InventoryView is a class.
+     * In versions 1.21 and later, it is an interface.
+     * This method uses reflection to get the top Inventory object from the
+     * InventoryView associated with an InventoryEvent, to avoid runtime errors.
+     *
+     * @param view The generic InventoryView.
+     * @return The top Inventory object from the event's InventoryView.
+     */
+    public static Object getInventoryInfo(InventoryEvent event, String method) {
+        try {
+            Object view = event.getView();
+            Method getPlayer = view.getClass().getMethod(method);
+            getPlayer.setAccessible(true);
+            return getPlayer.invoke(view);
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @EventHandler
     public void onInventoryPrepareAnvilEvent(PrepareAnvilEvent event) {
-        if (event.getView().getPlayer().getOpenInventory().getTopInventory().getHolder() instanceof CustomAnvilGUIHolder) {
+        Player player = (Player) getInventoryInfo(event, "getPlayer");
+        Inventory topInventory = getTopInventory(player.getOpenInventory());
+        if (topInventory.getHolder() instanceof CustomAnvilGUIHolder) {
             Interface interface_ = Main.instance.getConfigGestion().getInterfaces().get("Anvil");
+            int repairCost = -1;
+            try {
+                repairCost = (int) getInventoryInfo(event, "getRepairCost");
+            } catch (RuntimeException exception) {
+                repairCost = event.getInventory().getRepairCost();
+            }
+            String renameText = "";
+            try {
+                renameText = (String) getInventoryInfo(event, "getRenameText");
+            } catch (RuntimeException exception) {
+                renameText = event.getInventory().getRenameText();
+            }
 
             if (debugGui) {
                 debugUtils.addLine("Custom Anvil Gui");
-                debugUtils.addLine("Repair Cost: " + event.getView().getRepairCost());
+                debugUtils.addLine("Repair Cost: " + repairCost);
                 debugUtils.addLine("Item Result: " + event.getResult());
-                debugUtils.addLine("Rename: " + event.getView().getRenameText());
+                debugUtils.addLine("Rename: " + renameText);
                 debugUtils.debug("PrepareAnvilEvent");
             }
 
-            if (event.getView().getRepairCost() > 0) {
+            if (repairCost > 0) {
                 if (event.getResult() != null && event.getResult().getType() != Material.AIR) {
-                    interface_.setCostOfEnchant(event.getView().getPlayer().getOpenInventory().getTopInventory(), event.getView().getRepairCost());
+                    interface_.setCostOfEnchant(topInventory, repairCost);
 
                     NBTItem nbtItem = new NBTItem(event.getResult());
-                    nbtItem.setInteger("ap.repairCost", event.getView().getRepairCost());
-                    event.getView().getPlayer().getOpenInventory().getTopInventory().setItem(
-                            interface_.getImportantSlots().get("NoResult"), nbtItem.getItem());
+                    nbtItem.setInteger("ap.repairCost", repairCost);
+                    topInventory.setItem(interface_.getImportantSlots().get("NoResult"), nbtItem.getItem());
                 }
             } else {
-                interface_.deleteResult(event.getView().getPlayer().getOpenInventory().getTopInventory());
+                interface_.deleteResult(topInventory);
             }
         }
     }
@@ -317,7 +369,7 @@ public class GuiEvent implements Listener {
 //                    blockData.setFacingDirection(blockFace);
 //                    ((org.bukkit.material.Directional) anvilLocation.getBlock().getState().getData()).setFacingDirection(blockFace);
 //                }
-                SoundManager.playSound(anvilLocation, Sound.BLOCK_ANVIL_USE, 100f, 100f);
+                Main.instance.soundManager.playSound(anvilLocation, "BLOCK_ANVIL_USE", 100f, 100f);
             } else if (anvilType == Material.CHIPPED_ANVIL) {
                 Directional blockData = (Directional) anvilLocation.getBlock().getBlockData();
                 BlockFace blockFace = blockData.getFacing();
@@ -340,13 +392,13 @@ public class GuiEvent implements Listener {
 //                    blockData.setFacingDirection(blockFace);
 //                    ((org.bukkit.material.Directional) anvilLocation.getBlock().getState().getData()).setFacingDirection(blockFace);
 //                }
-                SoundManager.playSound(anvilLocation, Sound.BLOCK_ANVIL_USE, 100f, 100f);
+                Main.instance.soundManager.playSound(anvilLocation, "BLOCK_ANVIL_USE", 100f, 100f);
             } else if (anvilType == Material.DAMAGED_ANVIL) {
                 anvilLocation.getBlock().setType(Material.AIR);
-                SoundManager.playSound(anvilLocation, Sound.BLOCK_ANVIL_DESTROY, 100f, 100f);
+                Main.instance.soundManager.playSound(anvilLocation, "BLOCK_ANVIL_USE", 100f, 100f);
             }
         } else {
-            SoundManager.playSound(anvilLocation, Sound.BLOCK_ANVIL_USE, 100f, 100f);
+            Main.instance.soundManager.playSound(anvilLocation, "BLOCK_ANVIL_USE", 100f, 100f);
         }
     }
 }

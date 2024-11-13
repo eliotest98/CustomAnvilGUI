@@ -7,10 +7,12 @@ import io.eliotesta98.CustomAnvilGUI.Interfaces.Interface;
 import io.eliotesta98.CustomAnvilGUI.Utils.CommentedConfiguration;
 import io.eliotesta98.CustomAnvilGUI.Utils.DebugUtils;
 import io.eliotesta98.CustomAnvilGUI.Utils.Library;
+import io.eliotesta98.CustomAnvilGUI.Utils.SoundManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +22,7 @@ public class Main extends JavaPlugin {
 
     public static Main instance;
     private ConfigGestion config;
+    public SoundManager soundManager;
 
     @Override
     public void onLoad() {
@@ -46,8 +49,9 @@ public class Main extends JavaPlugin {
                         + "§e  Version " + getDescription().getVersion() + " \r\n"
                         + "§e© Developed by §feliotesta98 & xSavior_of_God §ewith §4<3 \r\n \r\n");
 
+        //getServer().getConsoleSender().sendMessage("§6Detected " + getServer().getBukkitVersion() + " minecraft version");
         this.getServer().getConsoleSender().sendMessage("§6Loading config...");
-
+        this.soundManager = new SoundManager();
         File configFile = new File(this.getDataFolder(), "config.yml");
 
         if (!configFile.exists()) {
@@ -120,7 +124,7 @@ public class Main extends JavaPlugin {
         DebugUtils debugsistem = new DebugUtils();
         long tempo = System.currentTimeMillis();
         Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "CustomAnvilGUI has been disabled, §cBye bye! §e:(");
-        for(Map.Entry<String, Interface> inventory: Main.instance.getConfigGestion().getInterfaces().entrySet()) {
+        for (Map.Entry<String, Interface> inventory : Main.instance.getConfigGestion().getInterfaces().entrySet()) {
             inventory.getValue().closeAllInventories();
         }
         if (config.getDebug().get("Disabled")) {
