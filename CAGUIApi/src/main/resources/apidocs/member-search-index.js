@@ -1,0 +1,1 @@
+memberSearchIndex = [{"p":"io.eliotesta98.CustomAnvilGUI.Api","c":"CustomAnvilGuiApi","l":"CustomAnvilGuiApi()","u":"%3Cinit%3E()"},{"p":"io.eliotesta98.CustomAnvilGUI.Api","c":"CustomAnvilGuiApi","l":"setResult(Inventory, int, ItemStack)","u":"setResult(org.bukkit.inventory.Inventory,int,org.bukkit.inventory.ItemStack)"}];updateSearchResults();

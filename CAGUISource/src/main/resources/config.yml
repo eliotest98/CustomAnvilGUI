@@ -1,6 +1,6 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #                                                                                               #
-#                                    CustomGuiForAnvil                                          #
+#                                      CustomAnvilGUI                                           #
 #                           Created by eliotesta98 & xSavior_of_God                             #
 #                                                                                               #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -100,3 +100,5 @@ Debug:
   Disabled: false
   # Click in the gui
   ClickGui: false
+  # API
+  API: false
