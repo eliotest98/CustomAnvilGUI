@@ -2,7 +2,7 @@ package io.eliotesta98.CustomAnvilGUI.Interfaces;
 
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import io.eliotesta98.CustomAnvilGUI.Core.Main;
-import io.eliotesta98.CustomAnvilGUI.Event.PlayerWriteEvent;
+import io.eliotesta98.CustomAnvilGUI.Events.PlayerWriteEvent;
 import io.eliotesta98.CustomAnvilGUI.Utils.ColorUtils;
 import io.eliotesta98.CustomAnvilGUI.Utils.DebugUtils;
 import io.eliotesta98.CustomAnvilGUI.Utils.ExpUtils;
