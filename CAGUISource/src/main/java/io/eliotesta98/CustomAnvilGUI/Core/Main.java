@@ -4,10 +4,7 @@ import io.eliotesta98.CustomAnvilGUI.Commands.Commands;
 import io.eliotesta98.CustomAnvilGUI.Database.ConfigGestion;
 import io.eliotesta98.CustomAnvilGUI.Interfaces.GuiEvent;
 import io.eliotesta98.CustomAnvilGUI.Interfaces.Interface;
-import io.eliotesta98.CustomAnvilGUI.Utils.CommentedConfiguration;
-import io.eliotesta98.CustomAnvilGUI.Utils.DebugUtils;
-import io.eliotesta98.CustomAnvilGUI.Utils.Library;
-import io.eliotesta98.CustomAnvilGUI.Utils.SoundManager;
+import io.eliotesta98.CustomAnvilGUI.Utils.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -35,7 +32,7 @@ public class Main extends JavaPlugin {
     public void onEnable() {
         DebugUtils debugsistem = new DebugUtils();
         long tempo = System.currentTimeMillis();
-        int bStatsId = 17780;
+        int pluginId = 25649;
 
         getServer().getConsoleSender()
                 .sendMessage("\r\n \r\n \r\n §a #####      #      #####   #     #  ### \n" +
@@ -49,7 +46,7 @@ public class Main extends JavaPlugin {
                         + "§e  Version " + getDescription().getVersion() + " \r\n"
                         + "§e© Developed by §feliotesta98 & xSavior_of_God §ewith §4<3 \r\n \r\n");
 
-        //getServer().getConsoleSender().sendMessage("§6Detected " + getServer().getBukkitVersion() + " minecraft version");
+        new Metrics(this, pluginId);
         this.getServer().getConsoleSender().sendMessage("§6Loading config...");
         this.soundManager = new SoundManager();
         File configFile = new File(this.getDataFolder(), "config.yml");

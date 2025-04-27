@@ -3,7 +3,7 @@
 
     <groupId>io.eliotesta98.CustomAnvilGUI</groupId>
     <artifactId>CustomAnvilGUI</artifactId>
-    <version>1.4</version>
+    <version>1.5</version>
     <packaging>pom</packaging>
 
     <modules>

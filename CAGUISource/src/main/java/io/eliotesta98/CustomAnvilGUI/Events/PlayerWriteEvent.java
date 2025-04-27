@@ -1,4 +1,4 @@
-package io.eliotesta98.CustomAnvilGUI.Event;
+package io.eliotesta98.CustomAnvilGUI.Events;
 
 import io.eliotesta98.CustomAnvilGUI.Core.Main;
 import io.eliotesta98.CustomAnvilGUI.Utils.ColorUtils;
