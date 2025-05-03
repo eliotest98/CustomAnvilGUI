@@ -1,30 +1,42 @@
 package io.eliotesta98.CustomAnvilGUI.Interfaces;
 
 import io.eliotesta98.CustomAnvilGUI.Core.Main;
+import io.eliotesta98.CustomAnvilGUI.Events.PlayerWriteEvent;
 import io.eliotesta98.CustomAnvilGUI.Utils.ColorUtils;
+import io.eliotesta98.CustomAnvilGUI.Utils.ExpUtils;
+import io.eliotesta98.CustomAnvilGUI.Utils.SoundManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.geysermc.cumulus.form.CustomForm;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Interface {
-    private String title, soundOpen, nameInterface, nameInterfaceToOpen, nameInterfaceToReturn;
-    private ArrayList<String> slots = new ArrayList<>();
-    private HashMap<String, io.eliotesta98.CustomAnvilGUI.Interfaces.ItemConfig> itemsConfig = new HashMap<>();
+    private String title, nameInterface, nameInterfaceToOpen, nameInterfaceToReturn;
+    private Sound soundOpen;
+    private List<String> slots = new ArrayList<>();
+    private Map<String, ItemConfig> itemsConfig = new HashMap<>();
     private boolean debug;
     private int sizeModifiableSlot;
     private final Map<String, InventoryView> anvilInventories = new HashMap<>();
     private final Map<String, Integer> importantSlots = new HashMap<>();
     private final Map<String, String> importantSlotsLetter = new HashMap<>();
+    private final List<FloodgateInput> floodgateInputs;
+    private String successRename;
+    private String insufficientExp;
+    private boolean directRename;
 
-    public Interface(String title, String soundOpen, ArrayList<String> slots, HashMap<String, io.eliotesta98.CustomAnvilGUI.Interfaces.ItemConfig> itemsConfig, boolean debug, int sizeModifiableSlot, String nameInterface, String nameInterfaceToOpen, String nameInterfaceToReturn) {
+    public Interface(String title, Sound soundOpen, ArrayList<String> slots, HashMap<String, ItemConfig> itemsConfig, List<FloodgateInput> floodgateInputs, boolean debug, int sizeModifiableSlot, String nameInterface, String nameInterfaceToOpen, String nameInterfaceToReturn) {
         this.title = title;
         this.soundOpen = soundOpen;
         this.itemsConfig.putAll(itemsConfig);
@@ -34,6 +46,13 @@ public class Interface {
         this.nameInterface = nameInterface;
         this.nameInterfaceToOpen = nameInterfaceToOpen;
         this.nameInterfaceToReturn = nameInterfaceToReturn;
+        this.floodgateInputs = floodgateInputs;
+    }
+
+    public void initialize(String successRename, boolean directRename, String insufficientExp) {
+        this.successRename = successRename;
+        this.directRename = directRename;
+        this.insufficientExp = insufficientExp;
     }
 
     public String getTitle() {
@@ -44,27 +63,27 @@ public class Interface {
         this.title = title;
     }
 
-    public String getSoundOpen() {
+    public Sound getSoundOpen() {
         return soundOpen;
     }
 
-    public void setSoundOpen(String soundOpen) {
+    public void setSoundOpen(Sound soundOpen) {
         this.soundOpen = soundOpen;
     }
 
-    public ArrayList<String> getSlots() {
+    public List<String> getSlots() {
         return slots;
     }
 
-    public void setSlots(ArrayList<String> slots) {
+    public void setSlots(List<String> slots) {
         this.slots = slots;
     }
 
-    public HashMap<String, io.eliotesta98.CustomAnvilGUI.Interfaces.ItemConfig> getItemsConfig() {
+    public Map<String, io.eliotesta98.CustomAnvilGUI.Interfaces.ItemConfig> getItemsConfig() {
         return itemsConfig;
     }
 
-    public void setItemsConfig(HashMap<String, io.eliotesta98.CustomAnvilGUI.Interfaces.ItemConfig> itemsConfig) {
+    public void setItemsConfig(Map<String, io.eliotesta98.CustomAnvilGUI.Interfaces.ItemConfig> itemsConfig) {
         this.itemsConfig = itemsConfig;
     }
 
@@ -114,16 +133,24 @@ public class Interface {
             return;
         }
         Interface customInterface = Main.instance.getConfigGestion().getInterfaces().get("Anvil");
-
+        Player player = Bukkit.getPlayer(playerName);
         int itemSlot = customInterface.getImportantSlots().get("FirstItem");
         ItemStack item = inventory.getItem(itemSlot);
         if (item != null) {
-            dropLocation.getWorld().dropItem(dropLocation, item);
+            if (player != null && player.getInventory().firstEmpty() != -1) {
+                player.getInventory().addItem(item);
+            } else {
+                dropLocation.getWorld().dropItem(dropLocation, item);
+            }
         }
         int enchantSlot = customInterface.getImportantSlots().get("SecondItem");
         ItemStack enchantedBook = inventory.getItem(enchantSlot);
         if (enchantedBook != null && enchantedBook.getType() != Material.PAPER) {
-            dropLocation.getWorld().dropItem(dropLocation, enchantedBook);
+            if (player != null && player.getInventory().firstEmpty() != -1) {
+                player.getInventory().addItem(enchantedBook);
+            } else {
+                dropLocation.getWorld().dropItem(dropLocation, enchantedBook);
+            }
         }
         anvilInventories.remove(playerName);
     }
@@ -142,7 +169,7 @@ public class Interface {
             if (player == null) {
                 continue;
             }
-            Inventory topInventory = GuiEvent.getTopInventory(inventory.getValue());
+            Inventory topInventory = player.getOpenInventory().getTopInventory();
             if (topInventory.getHolder() instanceof CustomAnvilGUIHolder) {
                 removeInventory(player.getName(), topInventory, player.getLocation(), false);
             }
@@ -154,9 +181,58 @@ public class Interface {
         anvilInventories.put(player.getName(), anvil);
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(Main.instance, () -> {
-            Inventory customAnvilInventory = getCustomAnvilInventory();
+            Inventory customAnvilInventory = getCustomAnvilInventory(player);
             player.openInventory(customAnvilInventory);
+            SoundManager.playSound(player, soundOpen, 15.0f, 10.0f);
         });
+    }
+
+    public void openInterface(Player player, PlayerWriteEvent event) {
+        if (!Main.floodgateUtils.isBedrockPlayer(player.getUniqueId())) {
+            return;
+        }
+        SoundManager.playSound(player, soundOpen, 15.0f, 10.0f);
+        Main.floodgateUtils.getBedrockPlayer(player.getUniqueId()).sendForm(createCustomForm(player, event).build());
+    }
+
+    private CustomForm.Builder createCustomForm(Player player, PlayerWriteEvent event) {
+        CustomForm.Builder customForm = CustomForm.builder().title(title);
+        for (FloodgateInput floodgateInput : floodgateInputs) {
+            switch (floodgateInput.getType()) {
+                case "Input":
+                    customForm.input(floodgateInput.getLabel(), floodgateInput.getPlaceholder());
+                    break;
+                case "Button":
+                    break;
+                default:
+                    break;
+            }
+        }
+        customForm.validResultHandler(response -> {
+                    if (directRename) {
+                        int experienceRaw = ExpUtils.getExp(player);
+                        double levels = ExpUtils.getLevelFromExp(experienceRaw);
+                        if (levels >= 1) {
+                            ItemStack itemInHand = event.getItemInHand(player.getName());
+                            player.getInventory().remove(itemInHand);
+                            ItemMeta itemMeta = itemInHand.getItemMeta();
+                            itemMeta.setItemName(response.asInput(0));
+                            itemInHand.setItemMeta(itemMeta);
+                            player.getInventory().addItem(itemInHand);
+                            Bukkit.getScheduler().scheduleSyncDelayedTask(Main.instance, () -> GuiEvent.damageAnvil(player, event.getAnvilLocation(), event.getInv()));
+                            ExpUtils.changeExpLevels(player, -1);
+                        } else {
+                            player.sendMessage(ColorUtils.applyColor(insufficientExp));
+                        }
+                        event.removePlayer(player.getName());
+                    } else {
+                        event.addPlayer(player.getName(), event.getItemInHand(player.getName()), event.createItemStack(response.asInput(0)));
+                        player.sendMessage(ColorUtils.applyColor(successRename));
+                    }
+                })
+                .closedResultHandler(() -> event.removePlayer(player.getName()))
+                .invalidResultHandler(() -> event.removePlayer(player.getName()));
+        return customForm;
     }
 
     public void setCostOfEnchant(Inventory inventory, int levels) {
@@ -178,47 +254,66 @@ public class Interface {
     public void deleteResult(Inventory inventory) {
         int slotCost = importantSlots.get("Cost");
         setBorder(inventory, slotCost);
-        setBarrier(inventory);
+        setBarrier(inventory, " ");
     }
 
-    public void setBarrier(Inventory inventory) {
+    public void setBarrier(Inventory inventory, String reason) {
         int slotResult = importantSlots.get("NoResult");
-        inventory.setItem(slotResult, this.getItemsConfig().get(importantSlotsLetter.get("NoResult")).createItemConfig(this.getNameInterface(), "", slotResult));
+        inventory.setItem(slotResult, getItemsConfig().get(importantSlotsLetter.get("NoResult")).createItemConfig(getNameInterface(), "ap.message:" + reason, slotResult));
     }
 
-    private Inventory getCustomAnvilInventory() {
-        CustomAnvilGUIHolder holder = new CustomAnvilGUIHolder(this.getSlots().size(), ColorUtils.applyColor(this.getTitle()));
+    public void setRename(Inventory inventory, Player player, PlayerWriteEvent event, ItemStack itemToRename) {
+        int slotToChange = importantSlots.get("FirstItem");
+        inventory.setItem(slotToChange, itemToRename);
+        slotToChange = importantSlots.get("SecondItem");
+        inventory.setItem(slotToChange, event.getItemWithPlayerName(player.getName()));
+    }
+
+    private Inventory getCustomAnvilInventory(Player player) {
+        CustomAnvilGUIHolder holder = new CustomAnvilGUIHolder(this.getSlots().size(), ColorUtils.applyColor(getTitle()));
         // prendo l'inventario
         final Inventory inventory = holder.getInventory();
 
         Bukkit.getScheduler().runTaskAsynchronously(Main.instance, () -> {
-            for (int i = 0; i < this.getSlots().size(); i++) {// scorro gli slot
-                String slot = this.getSlots().get(i);// prendo lo slot
-                if (this.getItemsConfig().get(slot) == null) {
+            for (int i = 0; i < getSlots().size(); i++) {// scorro gli slot
+                String slot = getSlots().get(i);// prendo lo slot
+                if (getItemsConfig().get(slot) == null) {
                     continue;
                 }
-                if (this.itemsConfig.get(slot).getNameItemConfig().equalsIgnoreCase("FirstItem")) {
-                    importantSlots.putIfAbsent(this.itemsConfig.get(slot).getNameItemConfig(), i);
-                    importantSlotsLetter.putIfAbsent(this.itemsConfig.get(slot).getNameItemConfig(), slot);
-                } else if (this.itemsConfig.get(slot).getNameItemConfig().equalsIgnoreCase("SecondItem")) {
-                    importantSlots.putIfAbsent(this.itemsConfig.get(slot).getNameItemConfig(), i);
-                    importantSlotsLetter.putIfAbsent(this.itemsConfig.get(slot).getNameItemConfig(), slot);
-                } else if (this.itemsConfig.get(slot).getNameItemConfig().equalsIgnoreCase("NoResult")) {
-                    importantSlots.putIfAbsent(this.itemsConfig.get(slot).getNameItemConfig(), i);
-                    importantSlotsLetter.putIfAbsent(this.itemsConfig.get(slot).getNameItemConfig(), slot);
-                    inventory.setItem(i, this.getItemsConfig().get(slot).createItemConfig(this.getNameInterface(), "", i));
-                } else if (this.itemsConfig.get(slot).getNameItemConfig().equalsIgnoreCase("Cost")) {
-                    importantSlots.putIfAbsent(this.itemsConfig.get(slot).getNameItemConfig(), i);
-                    importantSlotsLetter.putIfAbsent(this.itemsConfig.get(slot).getNameItemConfig(), slot);
+                if (itemsConfig.get(slot).getNameItemConfig().equalsIgnoreCase("FirstItem")) {
+                    importantSlots.putIfAbsent(itemsConfig.get(slot).getNameItemConfig(), i);
+                    importantSlotsLetter.putIfAbsent(itemsConfig.get(slot).getNameItemConfig(), slot);
+                } else if (itemsConfig.get(slot).getNameItemConfig().equalsIgnoreCase("SecondItem")) {
+                    importantSlots.putIfAbsent(itemsConfig.get(slot).getNameItemConfig(), i);
+                    importantSlotsLetter.putIfAbsent(itemsConfig.get(slot).getNameItemConfig(), slot);
+                } else if (itemsConfig.get(slot).getNameItemConfig().equalsIgnoreCase("NoResult")) {
+                    importantSlots.putIfAbsent(itemsConfig.get(slot).getNameItemConfig(), i);
+                    importantSlotsLetter.putIfAbsent(itemsConfig.get(slot).getNameItemConfig(), slot);
+                    inventory.setItem(i, getItemsConfig().get(slot).createItemConfig(getNameInterface(), "ap.message: ", i));
+                } else if (itemsConfig.get(slot).getNameItemConfig().equalsIgnoreCase("Cost")) {
+                    importantSlots.putIfAbsent(itemsConfig.get(slot).getNameItemConfig(), i);
+                    importantSlotsLetter.putIfAbsent(itemsConfig.get(slot).getNameItemConfig(), slot);
                     for (Map.Entry<String, ItemConfig> itemConfig : itemsConfig.entrySet()) {
                         if (itemConfig.getValue().getNameItemConfig().equalsIgnoreCase("Border")) {
-                            inventory.setItem(i, itemConfig.getValue().createItemConfig(this.getNameInterface(), "", i));
+                            inventory.setItem(i, itemConfig.getValue().createItemConfig(getNameInterface(), "", i));
                             break;
                         }
                     }
+                } else if (itemsConfig.get(slot).getNameItemConfig().equalsIgnoreCase("Back")) {
+                    if (!Main.floodgateUtils.isBedrockPlayer(player.getUniqueId())) {
+                        importantSlotsLetter.putIfAbsent(itemsConfig.get(slot).getNameItemConfig(), slot);
+                        inventory.setItem(i, getItemsConfig().get(slot).createItemConfig(getNameInterface(), "", i));
+                    } else {
+                        for (Map.Entry<String, ItemConfig> itemConfig : itemsConfig.entrySet()) {
+                            if (itemConfig.getValue().getNameItemConfig().equalsIgnoreCase("Border")) {
+                                inventory.setItem(i, itemConfig.getValue().createItemConfig(getNameInterface(), "", i));
+                                break;
+                            }
+                        }
+                    }
                 } else {
-                    importantSlotsLetter.putIfAbsent(this.itemsConfig.get(slot).getNameItemConfig(), slot);
-                    inventory.setItem(i, this.getItemsConfig().get(slot).createItemConfig(this.getNameInterface(), "", i));
+                    importantSlotsLetter.putIfAbsent(itemsConfig.get(slot).getNameItemConfig(), slot);
+                    inventory.setItem(i, getItemsConfig().get(slot).createItemConfig(getNameInterface(), "", i));
                 }
             }
         });

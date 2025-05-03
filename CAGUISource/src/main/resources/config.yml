@@ -5,12 +5,24 @@
 #                                                                                               #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
+Configuration:
+  Hooks:
+    Floodgate: false
+
+  # This section is for configuring how much is the possibility of anvil damage at every use.
+  # For default, there is 1/8 (12%) possibility to damage the anvil at each use
+  AnvilDamage:
+    Damage: 12
+
+  # Configure if you want directly the rename of item or reopen the anvil for rename an item
+  DirectRename: false
+
 Interface:
   Anvil:
     Title: "&0Repair & Name"
     OpenSound: ENTITY_ENDER_DRAGON_FLAP # ENDERDRAGON_WINGS <1.13
     Slots:
-      - 'bbbbbbbbx'
+      - 'tbbbbbbbx'
       - 'bfbsbebrb'
       - 'nbbbbbbcb'
     Items:
@@ -19,7 +31,7 @@ Interface:
         Name: ''
         Type: ''
         Texture: ''
-        Lore: []
+        Lore: [ ]
         SoundClick: ''
       SecondItem:
         Letter: 's'
@@ -37,7 +49,7 @@ Interface:
         SoundClick: ''
       NoResult:
         Letter: 'r'
-        Name: ' '
+        Name: '{message}'
         Type: 'BARRIER'
         Texture: ''
         Lore: [ ]
@@ -47,7 +59,7 @@ Interface:
         Name: '&a&oEnchantment Cost: {exp}'
         Type: 'EXPERIENCE_BOTTLE'
         Texture: ''
-        Lore: []
+        Lore: [ ]
         SoundClick: ''
       Back:
         Letter: 'x'
@@ -58,10 +70,20 @@ Interface:
         SoundClick: ''
       Rename:
         Letter: 'n'
-        Name: '&e>&e&l> &a&lRename &l&e<&e<'
+        Name: '&e>&e&l> &e&lRENAME <&e<'
         Type: 'NAME_TAG'
         Texture: ''
         Lore: [ ]
+        SoundClick: ''
+      Fix:
+        Letter: 't'
+        Name: '&b>&b&l> &b&lFIX <&b<'
+        Type: 'DIAMOND_PICKAXE'
+        Texture: ''
+        Lore:
+          - "&bRepair items in your inventory"
+          - "&b&l> &bLeft Click: repair the item in your main hand"
+          - "&b&l> &bRight Click: repair all items in your inventory"
         SoundClick: ''
       Border:
         Letter: 'b'
@@ -70,6 +92,20 @@ Interface:
         Texture: '' # set to '' to disable
         Lore: [ ]
         SoundClick: ''
+    Floodgate: { }
+
+  Rename:
+    Title: "Renaming..."
+    OpenSound: ENTITY_ENDER_DRAGON_FLAP # ENDERDRAGON_WINGS <1.13
+    Slots: [ ]
+    Items: { }
+    Floodgate:
+      1:
+        Type: 'Input'
+        Label: 'Item Name'
+        Placeholder: 'Diamond Sword'
+        DefaultText: ''
+
 
 # you can use a different coloring by using a hexadecimal. for all messages Ex. &{#FFFF00}(yellow).
 # Example for a command: '/cagui &{#FFFF00}<reload>&{#000000} command reload Labyrinth plugin'
@@ -81,8 +117,10 @@ Messages:
     Help: '   &e/cagui &6<help> &7for help commands'
   Success:
     Rename: '{prefix}&aTool name has been successfully registered, please now reopen the anvil, place your tool in the anvil and click on Rename button'
-  Lists: {}
-  Warnings: {}
+  Results:
+    NoItem: '&cHEY! &7You don''t have much experience for enchant this items!'
+  Lists: { }
+  Warnings: { }
   Info:
     Rename: '{prefix}&7Please write the name of your tool in chat'
   Errors:
