@@ -1,32 +1,41 @@
 package io.eliotesta98.CustomAnvilGUI.Database;
 
+import io.eliotesta98.CustomAnvilGUI.Interfaces.FloodgateInput;
 import io.eliotesta98.CustomAnvilGUI.Interfaces.Interface;
 import io.eliotesta98.CustomAnvilGUI.Interfaces.ItemConfig;
 import io.eliotesta98.CustomAnvilGUI.Utils.ColorUtils;
+import io.eliotesta98.CustomAnvilGUI.Utils.SoundManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ConfigGestion {
 
-    private HashMap<String, Boolean> hooks = new HashMap<>();
-    private HashMap<String, String> messages = new HashMap<>();
-    private HashMap<String, Boolean> debug = new HashMap<>();
-    private HashMap<String, Interface> interfaces = new HashMap<>();
+    private final HashMap<String, Boolean> hooks = new HashMap<>();
+    private final HashMap<String, String> messages = new HashMap<>();
+    private final HashMap<String, Boolean> debug = new HashMap<>();
+    private final HashMap<String, Interface> interfaces = new HashMap<>();
+    private final int percentageDamage;
+    private final boolean directRename;
 
     public ConfigGestion(FileConfiguration file) {
+
+        percentageDamage = file.getInt("Configuration.AnvilDamage.Damage", 12);
+        directRename = file.getBoolean("Configuration.DirectRename");
 
         for (String event : file.getConfigurationSection("Debug").getKeys(false)) {
             debug.put(event, file.getBoolean("Debug." + event));
         }
 
-//        for (String hook : file.getConfigurationSection("Configuration.Hooks").getKeys(false)) {
-//            hooks.put(hook, file.getBoolean("Configuration.Hooks." + hook));
-//        }
+        for (String hook : file.getConfigurationSection("Configuration.Hooks").getKeys(false)) {
+            hooks.put(hook, file.getBoolean("Configuration.Hooks." + hook));
+        }
 
         String prefix = "";
         for (String message : file.getConfigurationSection("Messages").getKeys(false)) {
@@ -45,6 +54,7 @@ public class ConfigGestion {
                     || message.equalsIgnoreCase("Errors")
                     || message.equalsIgnoreCase("Success")
                     || message.equalsIgnoreCase("Info")
+                    || message.equalsIgnoreCase("Results")
             ) {
                 for (String success : file.getConfigurationSection("Messages." + message).getKeys(false)) {
                     messages.put(message + "." + success, file.getString("Messages." + message + "." + success).replace("{prefix}", prefix));
@@ -56,9 +66,24 @@ public class ConfigGestion {
 
         for (String nameInterface : file.getConfigurationSection("Interface").getKeys(false)) {
             String title = file.getString("Interface." + nameInterface + ".Title");
-            String openSound = file.getString("Interface." + nameInterface + ".OpenSound");
+            String rawSound = file.getString("Interface." + nameInterface + ".OpenSound", "");
+            Sound openSound = SoundManager.getSound(rawSound);
+            if (openSound == null && !rawSound.equalsIgnoreCase("")) {
+                Bukkit.getConsoleSender().sendMessage(ColorUtils.applyColor("&cERROR UNABLE TO RESOLVE SOUND " + rawSound + " for Interfaces." + nameInterface + ".OpenSound"));
+            }
             ArrayList<String> slots = new ArrayList<>();
             ArrayList<String> contaSlots = new ArrayList<>();
+
+            List<FloodgateInput> inputs = new ArrayList<>();
+            for (String number : file.getConfigurationSection("Interface." + nameInterface + ".Floodgate").getKeys(false)) {
+                String base = "Interface." + nameInterface + ".Floodgate." + number;
+                FloodgateInput floodgateInput = new FloodgateInput(
+                        file.getString(base + ".Type"),
+                        file.getString(base + ".Label"),
+                        file.getString(base + ".Placeholder", ""),
+                        file.getString(base + ".DefaultText", ""));
+                inputs.add(floodgateInput);
+            }
 
             HashMap<String, ItemConfig> itemsConfig = new HashMap<>();
             for (String nameItem : file.getConfigurationSection("Interface." + nameInterface + ".Items").getKeys(false)) {
@@ -96,14 +121,9 @@ public class ConfigGestion {
                     slots.add("" + value.charAt(i));
                 }
             });
-            Interface customInterface;
-            if (nameInterface.equalsIgnoreCase("Anvil")) {
-                customInterface = new Interface(title, openSound, slots, itemsConfig, debug.get("ClickGui"),
-                        contaSlots.size(), nameInterface, "Generator", "");
-            } else {
-                customInterface = new Interface(title, openSound, slots, itemsConfig, debug.get("ClickGui"),
-                        contaSlots.size(), nameInterface, "", "");
-            }
+            Interface customInterface = new Interface(title, openSound, slots, itemsConfig, inputs, debug.get("ClickGui"),
+                    contaSlots.size(), nameInterface, "", "");
+            customInterface.initialize(messages.get("Success.Rename"), directRename, messages.get("Errors.InsufficientExperience"));
             interfaces.put(nameInterface, customInterface);
         }
     }
@@ -112,32 +132,24 @@ public class ConfigGestion {
         return hooks;
     }
 
-    public void setHooks(HashMap<String, Boolean> hooks) {
-        this.hooks = hooks;
-    }
-
     public HashMap<String, String> getMessages() {
         return messages;
-    }
-
-    public void setMessages(HashMap<String, String> messages) {
-        this.messages = messages;
     }
 
     public HashMap<String, Boolean> getDebug() {
         return debug;
     }
 
-    public void setDebug(HashMap<String, Boolean> debug) {
-        this.debug = debug;
-    }
-
     public HashMap<String, Interface> getInterfaces() {
         return interfaces;
     }
 
-    public void setInterfaces(HashMap<String, Interface> interfaces) {
-        this.interfaces = interfaces;
+    public int getPercentageDamage() {
+        return percentageDamage;
+    }
+
+    public boolean isDirectRename() {
+        return directRename;
     }
 
     @Override

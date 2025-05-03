@@ -72,7 +72,7 @@ public class ItemConfig {
             }
             itemm.setLore(lorenew);
         }
-        String newName = "";
+        String newName;
         if (name.contains("{exp}")) {
             String cost = "";
             if (!nbt.equalsIgnoreCase("")) {
@@ -86,6 +86,19 @@ public class ItemConfig {
                 }
             }
             newName = name.replace("{exp}", cost);
+        } else if (name.contains("{message}")) {
+            String message = "";
+            if (!nbt.equalsIgnoreCase("")) {
+                String[] nbtList = nbt.split(";");
+                for (String nbtString : nbtList) {
+                    String[] nbtSplit = nbtString.split(":");
+                    if (nbtSplit[0].equalsIgnoreCase("ap.message")) {
+                        message = nbtSplit[1];
+                        break;
+                    }
+                }
+            }
+            newName = name.replace("{message}", message);
         } else {
             newName = name;
         }

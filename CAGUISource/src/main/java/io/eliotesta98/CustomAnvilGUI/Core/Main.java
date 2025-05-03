@@ -4,6 +4,7 @@ import io.eliotesta98.CustomAnvilGUI.Commands.Commands;
 import io.eliotesta98.CustomAnvilGUI.Database.ConfigGestion;
 import io.eliotesta98.CustomAnvilGUI.Interfaces.GuiEvent;
 import io.eliotesta98.CustomAnvilGUI.Interfaces.Interface;
+import io.eliotesta98.CustomAnvilGUI.Module.Floodgate.FloodgateUtils;
 import io.eliotesta98.CustomAnvilGUI.Utils.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -18,13 +19,13 @@ import java.util.Map;
 public class Main extends JavaPlugin {
 
     public static Main instance;
+    public static FloodgateUtils floodgateUtils;
     private ConfigGestion config;
-    public SoundManager soundManager;
 
     @Override
     public void onLoad() {
         instance = this;
-
+        floodgateUtils = new FloodgateUtils();
         // Load libraries where Spigot does not do this automatically
         //loadLibraries();
     }
@@ -48,7 +49,6 @@ public class Main extends JavaPlugin {
 
         new Metrics(this, pluginId);
         this.getServer().getConsoleSender().sendMessage("§6Loading config...");
-        this.soundManager = new SoundManager();
         File configFile = new File(this.getDataFolder(), "config.yml");
 
         if (!configFile.exists()) {
@@ -105,8 +105,28 @@ public class Main extends JavaPlugin {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         config = new ConfigGestion(YamlConfiguration.loadConfiguration(configFile));
         getServer().getConsoleSender().sendMessage("§aConfiguration Loaded!");
+
+        new UpdateChecker(instance, 116411).getVersion(version1 -> {
+            if (!instance.getDescription().getVersion().equals(version1)) {
+                getServer().getConsoleSender().sendMessage(ChatColor.RED + "New Update available for CustomAnvilGUI!");
+            }
+        });
+
+        // RUNNABLE PER CARICARE LE DIPENDENZE ALLA FINE DELL'AVVIO DEL SERVER :D
+        getServer().getScheduler().scheduleSyncDelayedTask(this, () -> {
+            if (getConfigGestion().getHooks().get("Floodgate")) {
+                try {
+                    floodgateUtils.initialize();
+                    Bukkit.getServer().getConsoleSender().sendMessage(ColorUtils.applyColor("&fFloodgate&a hooked!"));
+                } catch (Exception e) {
+                    Bukkit.getServer().getConsoleSender().sendMessage(ColorUtils.applyColor("&cSomething went wrong while adding compatibility to &eFloodgate&c! &f" + e.getMessage()));
+                    e.printStackTrace();
+                }
+            }
+        });
 
         Bukkit.getServer().getPluginManager().registerEvents(new GuiEvent(), this);
         getCommand("customanvilgui").setExecutor(new Commands());

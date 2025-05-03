@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.eliotesta98.CustomAnvilGUI</groupId>
     <artifactId>CAGUISource</artifactId>
-    <version>1.5</version>
+    <version>1.5.1</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -166,6 +166,19 @@
             <artifactId>authlib</artifactId>
             <version>3.16.29</version>
             <scope>provided</scope>
+        </dependency>
+        <!-- Floodgate -->
+        <dependency>
+            <groupId>org.geysermc.floodgate</groupId>
+            <artifactId>api</artifactId>
+            <version>2.2.3-SNAPSHOT</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.geysermc.cumulus</groupId>
+                    <artifactId>cumulus</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- Brigadier -->
         <dependency>

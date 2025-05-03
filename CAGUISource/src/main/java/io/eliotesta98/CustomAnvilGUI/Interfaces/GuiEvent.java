@@ -6,6 +6,7 @@ import io.eliotesta98.CustomAnvilGUI.Events.PlayerWriteEvent;
 import io.eliotesta98.CustomAnvilGUI.Utils.ColorUtils;
 import io.eliotesta98.CustomAnvilGUI.Utils.DebugUtils;
 import io.eliotesta98.CustomAnvilGUI.Utils.ExpUtils;
+import io.eliotesta98.CustomAnvilGUI.Utils.SoundManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -13,6 +14,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Directional;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.PlayerKickEvent;
@@ -20,6 +22,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.lang.reflect.InvocationTargetException;
@@ -34,14 +37,21 @@ public class GuiEvent implements Listener {
     private final boolean debugGui = Main.instance.getConfigGestion().getDebug().get("ClickGui");
     private final String insufficientExp = Main.instance.getConfigGestion().getMessages().get("Errors.InsufficientExperience");
     private final String renameInfo = Main.instance.getConfigGestion().getMessages().get("Info.Rename");
+    private final String guiInsufficientExp = Main.instance.getConfigGestion().getMessages().get("Results.NoItem");
     private final List<String> whitelistedPlayers = new ArrayList<>();
     private final DebugUtils debugUtils = new DebugUtils();
+    private static final int percentageDamage = Main.instance.getConfigGestion().getPercentageDamage();
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onAnvilInventoryOpen(InventoryOpenEvent event) {
         if (event.getInventory().getType().toString().equalsIgnoreCase("ANVIL")
                 && !whitelistedPlayers.contains(event.getPlayer().getName())) {
+            if (debugGui) {
+                debugUtils.addLine("Open Inventory");
+                debugUtils.debug("InventoryOpenEvent");
+            }
             Main.instance.getConfigGestion().getInterfaces().get("Anvil").openInterface((Player) event.getPlayer(), event.getView());
+            event.setCancelled(true);
         }
     }
 
@@ -50,10 +60,16 @@ public class GuiEvent implements Listener {
         DebugUtils debug = new DebugUtils();
         long time = System.currentTimeMillis();
         if (event.getInventory().getHolder() instanceof CustomAnvilGUIHolder) {
+            if (debugGui) {
+                debug.addLine("Custom Anvil Closing");
+            }
             Main.instance.getConfigGestion().getInterfaces().get("Anvil")
                     .removeInventory(event.getPlayer().getName(), event.getInventory(), event.getPlayer().getLocation(), false);
         }
         if (event.getInventory().getType().toString().equalsIgnoreCase("ANVIL")) {
+            if (debugGui) {
+                debug.addLine("Removing from whitelist");
+            }
             whitelistedPlayers.remove(event.getPlayer().getName());
         }
         if (debugGui) {
@@ -137,6 +153,7 @@ public class GuiEvent implements Listener {
             Inventory topInventory = getTopInventory(inventoryView);
             Location anvilLocation = topInventory.getLocation();
             Material anvilType = anvilLocation.getBlock().getType();
+            ClickType clickType = event.getClick();
             if (anvilType != Material.ANVIL && anvilType != Material.DAMAGED_ANVIL && anvilType != Material.CHIPPED_ANVIL) {
                 p.closeInventory();
                 if (debugGui) {
@@ -148,7 +165,7 @@ public class GuiEvent implements Listener {
 
             String typeInterface = "Anvil";
             Interface customInterface = Main.instance.getConfigGestion().getInterfaces().get(typeInterface);
-            ArrayList<String> slots = customInterface.getSlots();
+            List<String> slots = customInterface.getSlots();
             String nameItemConfig = customInterface.getItemsConfig().get(slots.get(event.getSlot())).getNameItemConfig();
             if (event.getCurrentItem() != null && customInterface.getItemsConfig().get(slots.get(event.getSlot())).getType().equalsIgnoreCase(event.getCurrentItem().getType().toString())) {
                 event.setCancelled(true);
@@ -158,7 +175,7 @@ public class GuiEvent implements Listener {
                     topInventory.setItem(0, null);
                     topInventory.setItem(1, null);
                     whitelistedPlayers.add(p.getName());
-                    Main.instance.getConfigGestion().getInterfaces().get("Anvil").removeInventory(p.getName(), event.getClickedInventory(), p.getLocation(), true);
+                    customInterface.removeInventory(p.getName(), event.getClickedInventory(), p.getLocation(), true);
                     try {
                         p.openInventory(inventoryView);
                     } catch (IllegalArgumentException ignore) {
@@ -168,13 +185,11 @@ public class GuiEvent implements Listener {
                 // Submit
                 else if (nameItemConfig.equalsIgnoreCase("Submit")) {
                     topInventory.clear();
-                    ItemStack firstItem = inv.getItem(Main.instance.getConfigGestion().getInterfaces().get("Anvil")
-                            .getImportantSlots().get("FirstItem"));
+                    ItemStack firstItem = inv.getItem(customInterface.getImportantSlots().get("FirstItem"));
                     if (firstItem == null) {
                         firstItem = new ItemStack(Material.AIR);
                     }
-                    ItemStack secondItem = inv.getItem(Main.instance.getConfigGestion().getInterfaces().get("Anvil")
-                            .getImportantSlots().get("SecondItem"));
+                    ItemStack secondItem = inv.getItem(customInterface.getImportantSlots().get("SecondItem"));
                     if (secondItem == null) {
                         secondItem = new ItemStack(Material.AIR);
                     } else if (secondItem.getType() == Material.PAPER) {
@@ -184,8 +199,14 @@ public class GuiEvent implements Listener {
                         renamedItem.setItemMeta(meta);
                         NBTItem nbtItem = new NBTItem(renamedItem);
                         nbtItem.setInteger("ap.repairCost", 1);
+                        int experienceRaw = ExpUtils.getExp(p);
+                        double levels = ExpUtils.getLevelFromExp(experienceRaw);
                         customInterface.setCostOfEnchant(inv, 1);
-                        inv.setItem(Main.instance.getConfigGestion().getInterfaces().get("Anvil").getImportantSlots().get("NoResult"), nbtItem.getItem());
+                        if (levels >= 1) {
+                            inv.setItem(customInterface.getImportantSlots().get("NoResult"), nbtItem.getItem());
+                        } else {
+                            customInterface.setBarrier(inv, guiInsufficientExp);
+                        }
                         return;
                     }
                     topInventory.setItem(0, firstItem);
@@ -193,20 +214,64 @@ public class GuiEvent implements Listener {
                 }
                 // Rename
                 else if (nameItemConfig.equalsIgnoreCase("Rename")) {
+                    ItemStack itemToRename = inv.getItem(customInterface.getImportantSlots().get("FirstItem"));
                     // se il primo slot contiene l'item e il secondo slot è vuoto
-                    if (inv.getItem(Main.instance.getConfigGestion().getInterfaces().get("Anvil").getImportantSlots()
-                            .get("FirstItem")) != null && inv.getItem(Main.instance.getConfigGestion().getInterfaces()
-                            .get("Anvil").getImportantSlots().get("SecondItem")) == null) {
-                        Bukkit.getServer().getPluginManager().registerEvents(playerWriteEvent, Main.instance);
-                        if (playerWriteEvent.isPlayerRename(p.getName())) {
-                            inv.setItem(Main.instance.getConfigGestion().getInterfaces().get("Anvil").getImportantSlots()
-                                    .get("SecondItem"), playerWriteEvent.getItemWithPlayerName(p.getName()));
-                            playerWriteEvent.removePlayer(p.getName());
-                            playerWriteEvent.disableEvent();
+                    if (itemToRename != null &&
+                            inv.getItem(customInterface.getImportantSlots().get("SecondItem")) == null) {
+                        if (Main.floodgateUtils.isBedrockPlayer(p.getUniqueId())) {
+                            if (playerWriteEvent.isPlayerRename(p.getName())) {
+                                inv.setItem(customInterface.getImportantSlots()
+                                        .get("SecondItem"), playerWriteEvent.getItemWithPlayerName(p.getName()));
+                                playerWriteEvent.removePlayer(p.getName());
+                                damageAnvil(p, anvilLocation, inv);
+                            } else {
+                                p.closeInventory();
+                                playerWriteEvent.setInventory(inv);
+                                playerWriteEvent.setAnvilLocation(anvilLocation);
+                                playerWriteEvent.addPlayer(p.getName(), inv.getItem(customInterface.getImportantSlots().get("FirstItem")));
+                                Bukkit.getScheduler().scheduleSyncDelayedTask(Main.instance, () -> {
+                                    Main.instance.getConfigGestion().getInterfaces().get("Rename").openInterface(p, playerWriteEvent);
+                                }, 5L);
+                            }
                         } else {
-                            playerWriteEvent.addPlayer(p.getName());
-                            p.closeInventory();
-                            p.sendMessage(ColorUtils.applyColor(renameInfo));
+                            Bukkit.getServer().getPluginManager().registerEvents(playerWriteEvent, Main.instance);
+                            playerWriteEvent.setInventory(inv);
+                            playerWriteEvent.setAnvilLocation(anvilLocation);
+                            if (playerWriteEvent.isPlayerRename(p.getName())) {
+                                inv.setItem(Main.instance.getConfigGestion().getInterfaces().get("Anvil").getImportantSlots()
+                                        .get("SecondItem"), playerWriteEvent.getItemWithPlayerName(p.getName()));
+                                playerWriteEvent.removePlayer(p.getName());
+                                playerWriteEvent.disableEvent();
+                                damageAnvil(p, anvilLocation, inv);
+                            } else {
+                                playerWriteEvent.addPlayer(p.getName(), inv.getItem(customInterface.getImportantSlots().get("FirstItem")));
+                                p.closeInventory();
+                                p.sendMessage(ColorUtils.applyColor(renameInfo));
+                            }
+                        }
+                    }
+                }
+                // Fix
+                else if (nameItemConfig.equalsIgnoreCase("Fix")) {
+                    // Fix the single item in the main hand
+                    if (clickType == ClickType.LEFT) {
+                        ItemStack itemStack = p.getInventory().getItemInHand();
+                        if (itemStack.getItemMeta() instanceof Damageable) {
+                            Damageable itemMeta = (Damageable) itemStack.getItemMeta();
+                            itemMeta.setDamage(0);
+                            itemStack.setItemMeta(itemMeta);
+                            damageAnvil(p, anvilLocation, inv);
+                        }
+                    }
+                    // Fix all items in the player inventory
+                    else {
+                        for (ItemStack itemStack : p.getInventory().getStorageContents()) {
+                            if (itemStack != null && itemStack.getItemMeta() instanceof Damageable) {
+                                Damageable itemMeta = (Damageable) itemStack.getItemMeta();
+                                itemMeta.setDamage(0);
+                                itemStack.setItemMeta(itemMeta);
+                                damageAnvil(p, anvilLocation, inv);
+                            }
                         }
                     }
                 }
@@ -222,15 +287,23 @@ public class GuiEvent implements Listener {
                     debugUtils.debug("Click Gui");
                 }
 
-                ItemStack firstItem = inv.getItem(Main.instance.getConfigGestion().getInterfaces().get("Anvil").getImportantSlots().get("SecondItem"));
+                ItemStack firstItem = inv.getItem(customInterface.getImportantSlots().get("SecondItem"));
 
                 // Cost
                 if (nameItemConfig.equalsIgnoreCase("Cost")) {
                     event.setCancelled(true);
                 }
+                // Fix if is a border
+                else if (nameItemConfig.equalsIgnoreCase("Fix")) {
+                    event.setCancelled(true);
+                }
+                // Back if is a border
+                else if (nameItemConfig.equalsIgnoreCase("Back")) {
+                    event.setCancelled(true);
+                }
                 // First Item (Rename)
                 else if (nameItemConfig.equalsIgnoreCase("FirstItem") && firstItem != null && firstItem.getType() == Material.PAPER) {
-                    customInterface.setBarrier(inv);
+                    customInterface.setBarrier(inv, " ");
                     customInterface.setBorder(inv, customInterface.getImportantSlots().get("Cost"));
                 }
                 // Item
@@ -268,15 +341,16 @@ public class GuiEvent implements Listener {
                             } else {
                                 p.getWorld().dropItem(p.getLocation(), result);
                             }
-                            customInterface.setBarrier(inv);
+                            customInterface.setBarrier(inv, " ");
                             customInterface.setBorder(inv, customInterface.getImportantSlots().get("Cost"));
                             customInterface.deleteItemsWhenResult(inv);
-                            damageAnvil(anvilLocation);
+                            damageAnvil(p, anvilLocation, inv);
                         }
                     } else {
                         p.sendMessage(ColorUtils.applyColor(insufficientExp));
                     }
                 }
+
             }
         }
     }
@@ -307,7 +381,7 @@ public class GuiEvent implements Listener {
         Inventory topInventory = getTopInventory(player.getOpenInventory());
         if (topInventory.getHolder() instanceof CustomAnvilGUIHolder) {
             Interface interface_ = Main.instance.getConfigGestion().getInterfaces().get("Anvil");
-            int repairCost = -1;
+            int repairCost;
             try {
                 repairCost = (int) getInventoryInfo(event, "getRepairCost");
             } catch (RuntimeException exception) {
@@ -334,7 +408,14 @@ public class GuiEvent implements Listener {
 
                     NBTItem nbtItem = new NBTItem(event.getResult());
                     nbtItem.setInteger("ap.repairCost", repairCost);
-                    topInventory.setItem(interface_.getImportantSlots().get("NoResult"), nbtItem.getItem());
+
+                    int experienceRaw = ExpUtils.getExp(player);
+                    double levels = ExpUtils.getLevelFromExp(experienceRaw);
+                    if (levels >= repairCost) {
+                        topInventory.setItem(interface_.getImportantSlots().get("NoResult"), nbtItem.getItem());
+                    } else {
+                        interface_.setBarrier(topInventory, guiInsufficientExp);
+                    }
                 }
             } else {
                 interface_.deleteResult(topInventory);
@@ -342,10 +423,10 @@ public class GuiEvent implements Listener {
         }
     }
 
-    private void damageAnvil(Location anvilLocation) {
+    public static void damageAnvil(Player player, Location anvilLocation, Inventory inventory) {
         Random random = new Random();
         int extractedNumber = random.nextInt(100);
-        if (extractedNumber <= 12) {
+        if (extractedNumber <= percentageDamage) {
             Material anvilType = anvilLocation.getBlock().getType();
             if (anvilType == Material.ANVIL) {
                 Directional blockData = (Directional) anvilLocation.getBlock().getBlockData();
@@ -369,7 +450,7 @@ public class GuiEvent implements Listener {
 //                    blockData.setFacingDirection(blockFace);
 //                    ((org.bukkit.material.Directional) anvilLocation.getBlock().getState().getData()).setFacingDirection(blockFace);
 //                }
-                Main.instance.soundManager.playSound(anvilLocation, "BLOCK_ANVIL_USE", 100f, 100f);
+                SoundManager.playSound(anvilLocation, SoundManager.getSound("BLOCK_ANVIL_USE"), 100f, 100f);
             } else if (anvilType == Material.CHIPPED_ANVIL) {
                 Directional blockData = (Directional) anvilLocation.getBlock().getBlockData();
                 BlockFace blockFace = blockData.getFacing();
@@ -392,13 +473,16 @@ public class GuiEvent implements Listener {
 //                    blockData.setFacingDirection(blockFace);
 //                    ((org.bukkit.material.Directional) anvilLocation.getBlock().getState().getData()).setFacingDirection(blockFace);
 //                }
-                Main.instance.soundManager.playSound(anvilLocation, "BLOCK_ANVIL_USE", 100f, 100f);
+                SoundManager.playSound(anvilLocation, SoundManager.getSound("BLOCK_ANVIL_USE"), 100f, 100f);
             } else if (anvilType == Material.DAMAGED_ANVIL) {
                 anvilLocation.getBlock().setType(Material.AIR);
-                Main.instance.soundManager.playSound(anvilLocation, "BLOCK_ANVIL_USE", 100f, 100f);
+                player.closeInventory();
+                Main.instance.getConfigGestion().getInterfaces().get("Anvil")
+                        .removeInventory(player.getName(), inventory, player.getLocation(), true);
+                SoundManager.playSound(anvilLocation, SoundManager.getSound("BLOCK_ANVIL_USE"), 100f, 100f);
             }
         } else {
-            Main.instance.soundManager.playSound(anvilLocation, "BLOCK_ANVIL_USE", 100f, 100f);
+            SoundManager.playSound(anvilLocation, SoundManager.getSound("BLOCK_ANVIL_USE"), 100f, 100f);
         }
     }
 }

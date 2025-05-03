@@ -38,7 +38,6 @@ public class Commands implements CommandExecutor {
                 if (args.length == 0) {
                     String finale = "&e&lCustomAnvilGUI &7● Version " + Main.instance.getDescription().getVersion()
                             + " created by eliotesta98 & xSavior_of_God" + "\n\n";
-                    finale = finale + commandHelpHelp + "\n";
                     finale = finale + commandReloadHelp + "\n";
                     finale = finale + commandFooter;
                     sender.sendMessage(ColorUtils.applyColor(finale));
@@ -59,7 +58,6 @@ public class Commands implements CommandExecutor {
                     }
                     String finale = "&e&lCustomAnvilGUI &7● Version " + Main.instance.getDescription().getVersion()
                             + " created by eliotesta98 & xSavior_of_God" + "\n\n";
-                    finale = finale + commandHelpHelp + "\n";
                     finale = finale + commandReloadHelp + "\n";
                     finale = finale + "\n";
                     finale = finale + commandFooter;
@@ -93,7 +91,6 @@ public class Commands implements CommandExecutor {
                 else {
                     String finale = "&e&lCustomAnvilGUI &7● Version " + Main.instance.getDescription().getVersion()
                             + " created by eliotesta98 & xSavior_of_God" + "\n\n";
-                    finale = finale + commandHelpHelp + "\n";
                     finale = finale + commandReloadHelp + "\n";
                     finale = finale + "\n";
                     finale = finale + commandFooter;
@@ -119,9 +116,6 @@ public class Commands implements CommandExecutor {
                 if (args.length == 0) {
                     String finale = "&e&lCustomAnvilGUI &7● Version " + Main.instance.getDescription().getVersion()
                             + " created by eliotesta98 & xSavior_of_God" + "\n\n";
-                    if (p.hasPermission("cagui.command.help")) {
-                        finale = finale + commandHelpHelp + "\n";
-                    }
                     if (p.hasPermission("cagui.command.reload")) {
                         finale = finale + commandReloadHelp + "\n";
                     }
@@ -148,9 +142,6 @@ public class Commands implements CommandExecutor {
                     } else {
                         String finale = "&e&lCustomAnvilGUI &7● Version " + Main.instance.getDescription().getVersion()
                                 + " created by eliotesta98 & xSavior_of_God" + "\n\n";
-                        if (p.hasPermission("cagui.command.help")) {
-                            finale = finale + commandHelpHelp + "\n";
-                        }
                         if (p.hasPermission("cagui.command.reload")) {
                             finale = finale + commandReloadHelp + "\n";
                         }
@@ -197,9 +188,6 @@ public class Commands implements CommandExecutor {
                 else {
                     String finale = "&e&lCustomAnvilGUI &7● Version " + Main.instance.getDescription().getVersion()
                             + " created by eliotesta98 & xSavior_of_God" + "\n\n";
-                    if (p.hasPermission("cagui.command.help")) {
-                        finale = finale + commandHelpHelp + "\n";
-                    }
                     if (p.hasPermission("cagui.command.reload")) {
                         finale = finale + commandReloadHelp + "\n";
                     }
