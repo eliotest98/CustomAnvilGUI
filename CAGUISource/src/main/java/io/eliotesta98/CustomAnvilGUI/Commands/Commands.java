@@ -1,9 +1,9 @@
 package io.eliotesta98.CustomAnvilGUI.Commands;
 
+import com.HeroxWar.HeroxCore.MessageGesture;
+import com.HeroxWar.HeroxCore.ReloadGesture;
 import io.eliotesta98.CustomAnvilGUI.Core.Main;
-import io.eliotesta98.CustomAnvilGUI.Utils.ColorUtils;
 import io.eliotesta98.CustomAnvilGUI.Utils.DebugUtils;
-import io.eliotesta98.CustomAnvilGUI.Utils.ReloadUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -27,7 +27,7 @@ public class Commands implements CommandExecutor {
         if (!(sender instanceof Player)) {
             Bukkit.getScheduler().runTaskAsynchronously(Main.instance, () -> {
                 if (!command.getName().equalsIgnoreCase("customanvilgui")) {// comando se esiste
-                    sender.sendMessage(ColorUtils.applyColor(errorCommandNotFound));
+                    MessageGesture.sendMessage(sender,errorCommandNotFound);
                     if (debugCommands) {
                         debug.addLine("Commands execution time= " + (System.currentTimeMillis() - tempo));
                         debug.debug("Commands");
@@ -40,7 +40,7 @@ public class Commands implements CommandExecutor {
                             + " created by eliotesta98 & xSavior_of_God" + "\n\n";
                     finale = finale + commandReloadHelp + "\n";
                     finale = finale + commandFooter;
-                    sender.sendMessage(ColorUtils.applyColor(finale));
+                    MessageGesture.sendMessage(sender,finale);
                     if (debugCommands) {
                         debug.addLine("Commands execution time= " + (System.currentTimeMillis() - tempo));
                         debug.debug("Commands");
@@ -49,7 +49,7 @@ public class Commands implements CommandExecutor {
                 // help
                 else if (args[0].equalsIgnoreCase("help")) {
                     if (args.length != 1) {
-                        sender.sendMessage(ColorUtils.applyColor(commandHelpHelp));
+                        MessageGesture.sendMessage(sender,commandHelpHelp);
                         if (debugCommands) {
                             debug.addLine("Commands execution time= " + (System.currentTimeMillis() - tempo));
                             debug.debug("Commands");
@@ -61,7 +61,7 @@ public class Commands implements CommandExecutor {
                     finale = finale + commandReloadHelp + "\n";
                     finale = finale + "\n";
                     finale = finale + commandFooter;
-                    sender.sendMessage(ColorUtils.applyColor(finale));
+                    MessageGesture.sendMessage(sender,finale);
                     if (debugCommands) {
                         debug.addLine("Commands execution time= " + (System.currentTimeMillis() - tempo));
                         debug.debug("Commands");
@@ -70,7 +70,7 @@ public class Commands implements CommandExecutor {
                 // reload
                 else if (args[0].equalsIgnoreCase("reload")) {
                     if (args.length != 1) {
-                        sender.sendMessage(ColorUtils.applyColor(commandReloadHelp));
+                        MessageGesture.sendMessage(sender,commandReloadHelp);
                         if (debugCommands) {
                             debug.addLine("Commands execution time= " + (System.currentTimeMillis() - tempo));
                             debug.debug("Commands");
@@ -78,9 +78,9 @@ public class Commands implements CommandExecutor {
                         return;
                     }
                     Bukkit.getScheduler().scheduleSyncDelayedTask(Main.instance, () -> {
-                        sender.sendMessage(ColorUtils.applyColor("&6Reloading..."));
-                        ReloadUtils.reload();
-                        sender.sendMessage(ColorUtils.applyColor("&aReloaded!"));
+                        MessageGesture.sendMessage(sender,"&6Reloading...");
+                        ReloadGesture.reload(Main.instance.getName());
+                        MessageGesture.sendMessage(sender,"&aReloaded!");
                         if (debugCommands) {
                             debug.addLine("Commands execution time= " + (System.currentTimeMillis() - tempo));
                             debug.debug("Commands");
@@ -94,7 +94,7 @@ public class Commands implements CommandExecutor {
                     finale = finale + commandReloadHelp + "\n";
                     finale = finale + "\n";
                     finale = finale + commandFooter;
-                    sender.sendMessage(ColorUtils.applyColor(finale));
+                    MessageGesture.sendMessage(sender,finale);
                     if (debugCommands) {
                         debug.addLine("Commands execution time= " + (System.currentTimeMillis() - tempo));
                         debug.debug("Commands");
@@ -104,7 +104,7 @@ public class Commands implements CommandExecutor {
         } else {
             final Player p = (Player) sender;
             if (!command.getName().equalsIgnoreCase("customanvilgui")) {// comando se esiste
-                p.sendMessage(ColorUtils.applyColor(errorCommandNotFound));
+                MessageGesture.sendMessage(sender,errorCommandNotFound);
                 if (debugCommands) {
                     debug.addLine("Commands execution time= " + (System.currentTimeMillis() - tempo));
                     debug.debug("Commands");
@@ -121,7 +121,7 @@ public class Commands implements CommandExecutor {
                     }
                     finale = finale + "\n";
                     finale = finale + commandFooter;
-                    p.sendMessage(ColorUtils.applyColor(finale));
+                    MessageGesture.sendMessage(sender,finale);
                     if (debugCommands) {
                         debug.addLine("Commands execution time= " + (System.currentTimeMillis() - tempo));
                         debug.debug("Commands");
@@ -130,7 +130,7 @@ public class Commands implements CommandExecutor {
                 // help
                 else if (args[0].equalsIgnoreCase("help")) {
                     if (!p.hasPermission("cagui.command.help")) {
-                        p.sendMessage(ColorUtils.applyColor(errorInsufficientPermission));
+                        MessageGesture.sendMessage(sender,errorInsufficientPermission);
                         if (debugCommands) {
                             debug.addLine("Commands execution time= " + (System.currentTimeMillis() - tempo));
                             debug.debug("Commands");
@@ -138,7 +138,7 @@ public class Commands implements CommandExecutor {
                         return;
                     }
                     if (args.length != 1) {
-                        p.sendMessage(ColorUtils.applyColor(commandHelpHelp));
+                        MessageGesture.sendMessage(sender,commandHelpHelp);
                     } else {
                         String finale = "&e&lCustomAnvilGUI &7● Version " + Main.instance.getDescription().getVersion()
                                 + " created by eliotesta98 & xSavior_of_God" + "\n\n";
@@ -147,7 +147,7 @@ public class Commands implements CommandExecutor {
                         }
                         finale = finale + "\n";
                         finale = finale + commandFooter;
-                        p.sendMessage(ColorUtils.applyColor(finale));
+                        MessageGesture.sendMessage(sender,finale);
                     }
                     if (debugCommands) {
                         debug.addLine("Commands execution time= " + (System.currentTimeMillis() - tempo));
@@ -158,7 +158,7 @@ public class Commands implements CommandExecutor {
                 else if (args[0].equalsIgnoreCase("reload")) {
                     // controllo se ha il permesso
                     if (!p.hasPermission("cagui.command.reload")) {
-                        p.sendMessage(ColorUtils.applyColor(errorInsufficientPermission));
+                        MessageGesture.sendMessage(sender,errorInsufficientPermission);
                         if (debugCommands) {
                             debug.addLine("Commands execution time= " + (System.currentTimeMillis() - tempo));
                             debug.debug("Commands");
@@ -167,7 +167,7 @@ public class Commands implements CommandExecutor {
                     }
                     // deve scrivere p reload
                     if (args.length != 1) {
-                        p.sendMessage(ColorUtils.applyColor(commandReloadHelp));
+                        MessageGesture.sendMessage(sender,commandReloadHelp);
                         if (debugCommands) {
                             debug.addLine("Commands execution time= " + (System.currentTimeMillis() - tempo));
                             debug.debug("Commands");
@@ -175,9 +175,9 @@ public class Commands implements CommandExecutor {
                         return;
                     }
                     Bukkit.getScheduler().scheduleSyncDelayedTask(Main.instance, () -> {
-                        sender.sendMessage(ColorUtils.applyColor("&6Reloading..."));
-                        ReloadUtils.reload();
-                        sender.sendMessage(ColorUtils.applyColor("&aReloaded!"));
+                        MessageGesture.sendMessage(sender,"&6Reloading...");
+                        ReloadGesture.reload(Main.instance.getName());
+                        MessageGesture.sendMessage(sender,"&aReloaded!");
                         if (debugCommands) {
                             debug.addLine("Commands execution time= " + (System.currentTimeMillis() - tempo));
                             debug.debug("Commands");
@@ -193,7 +193,7 @@ public class Commands implements CommandExecutor {
                     }
                     finale = finale + "\n";
                     finale = finale + commandFooter;
-                    p.sendMessage(ColorUtils.applyColor(finale));
+                    MessageGesture.sendMessage(sender,finale);
                     if (debugCommands) {
                         debug.addLine("Commands execution time= " + (System.currentTimeMillis() - tempo));
                         debug.debug("Commands");

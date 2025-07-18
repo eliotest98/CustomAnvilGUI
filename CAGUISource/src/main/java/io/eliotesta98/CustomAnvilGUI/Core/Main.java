@@ -1,11 +1,16 @@
 package io.eliotesta98.CustomAnvilGUI.Core;
 
+import com.HeroxWar.HeroxCore.CommentedConfiguration;
+import com.HeroxWar.HeroxCore.MessageGesture;
 import io.eliotesta98.CustomAnvilGUI.Commands.Commands;
 import io.eliotesta98.CustomAnvilGUI.Database.ConfigGestion;
 import io.eliotesta98.CustomAnvilGUI.Interfaces.GuiEvent;
 import io.eliotesta98.CustomAnvilGUI.Interfaces.Interface;
 import io.eliotesta98.CustomAnvilGUI.Module.Floodgate.FloodgateUtils;
-import io.eliotesta98.CustomAnvilGUI.Utils.*;
+import io.eliotesta98.CustomAnvilGUI.Utils.DebugUtils;
+import io.eliotesta98.CustomAnvilGUI.Utils.Library;
+import io.eliotesta98.CustomAnvilGUI.Utils.Metrics;
+import io.eliotesta98.CustomAnvilGUI.Utils.UpdateChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -120,10 +125,9 @@ public class Main extends JavaPlugin {
             if (getConfigGestion().getHooks().get("Floodgate")) {
                 try {
                     floodgateUtils.initialize();
-                    Bukkit.getServer().getConsoleSender().sendMessage(ColorUtils.applyColor("&fFloodgate&a hooked!"));
+                    MessageGesture.sendMessage(Main.instance.getServer().getConsoleSender(), "&fFloodgate&a hooked!");
                 } catch (Exception e) {
-                    Bukkit.getServer().getConsoleSender().sendMessage(ColorUtils.applyColor("&cSomething went wrong while adding compatibility to &eFloodgate&c! &f" + e.getMessage()));
-                    e.printStackTrace();
+                    MessageGesture.sendMessage(Main.instance.getServer().getConsoleSender(), "&cSomething went wrong while adding compatibility to &eFloodgate&c! &f" + e.getMessage());
                 }
             }
         });

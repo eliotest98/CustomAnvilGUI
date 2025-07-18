@@ -1,13 +1,12 @@
 package io.eliotesta98.CustomAnvilGUI.Database;
 
+import com.HeroxWar.HeroxCore.MessageGesture;
+import com.HeroxWar.HeroxCore.SoundGesture.SoundType;
+import io.eliotesta98.CustomAnvilGUI.Core.Main;
 import io.eliotesta98.CustomAnvilGUI.Interfaces.FloodgateInput;
 import io.eliotesta98.CustomAnvilGUI.Interfaces.Interface;
 import io.eliotesta98.CustomAnvilGUI.Interfaces.ItemConfig;
-import io.eliotesta98.CustomAnvilGUI.Utils.ColorUtils;
-import io.eliotesta98.CustomAnvilGUI.Utils.SoundManager;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.ArrayList;
@@ -21,6 +20,7 @@ public class ConfigGestion {
     private final HashMap<String, String> messages = new HashMap<>();
     private final HashMap<String, Boolean> debug = new HashMap<>();
     private final HashMap<String, Interface> interfaces = new HashMap<>();
+    private final SoundType stageSound;
     private final int percentageDamage;
     private final boolean directRename;
 
@@ -28,6 +28,11 @@ public class ConfigGestion {
 
         percentageDamage = file.getInt("Configuration.AnvilDamage.Damage", 12);
         directRename = file.getBoolean("Configuration.DirectRename");
+        stageSound = new SoundType(
+                file.getString("Configuration.AnvilSound.SoundName"),
+                file.getDouble("Configuration.AnvilSound.Volume"),
+                file.getDouble("Configuration.AnvilSound.Pitch")
+        );
 
         for (String event : file.getConfigurationSection("Debug").getKeys(false)) {
             debug.put(event, file.getBoolean("Debug." + event));
@@ -66,11 +71,10 @@ public class ConfigGestion {
 
         for (String nameInterface : file.getConfigurationSection("Interface").getKeys(false)) {
             String title = file.getString("Interface." + nameInterface + ".Title");
-            String rawSound = file.getString("Interface." + nameInterface + ".OpenSound", "");
-            Sound openSound = SoundManager.getSound(rawSound);
-            if (openSound == null && !rawSound.equalsIgnoreCase("")) {
-                Bukkit.getConsoleSender().sendMessage(ColorUtils.applyColor("&cERROR UNABLE TO RESOLVE SOUND " + rawSound + " for Interfaces." + nameInterface + ".OpenSound"));
-            }
+            String rawSound = file.getString("Interface." + nameInterface + ".OpenSound.SoundName", "minecraft:entity.allay.item_thrown");
+            double volume = file.getDouble("Interface." + nameInterface + ".OpenSound.SoundName", 100.0);
+            double pitch = file.getDouble("Interface." + nameInterface + ".OpenSound.SoundName", 2.0);
+            SoundType openSound = new SoundType(rawSound, volume, pitch);
             ArrayList<String> slots = new ArrayList<>();
             ArrayList<String> contaSlots = new ArrayList<>();
 
@@ -93,12 +97,12 @@ public class ConfigGestion {
                     if (type.contains(";")) {
                         String[] x = type.split(";");
                         if (Material.getMaterial(x[0]) == null) {
-                            Bukkit.getConsoleSender().sendMessage(ColorUtils.applyColor("&c&lERROR WITH MATERIAL " + x[0] + " IN CONFIG.YML AT LINE: Interfaces." + nameInterface + ".Items." + nameItem + ".Type"));
+                            MessageGesture.sendMessage(Main.instance.getServer().getConsoleSender(), "&c&lERROR WITH MATERIAL " + x[0] + " IN CONFIG.YML AT LINE: Interfaces." + nameInterface + ".Items." + nameItem + ".Type");
                             type = "DIRT";
                         }
                     } else {
                         if (Material.getMaterial(type) == null) {
-                            Bukkit.getConsoleSender().sendMessage(ColorUtils.applyColor("&c&lERROR WITH MATERIAL " + type + " IN CONFIG.YML AT LINE: Interfaces." + nameInterface + ".Items." + nameItem + ".Type"));
+                            MessageGesture.sendMessage(Main.instance.getServer().getConsoleSender(), "&c&lERROR WITH MATERIAL " + type + " IN CONFIG.YML AT LINE: Interfaces." + nameInterface + ".Items." + nameItem + ".Type");
                             type = "DIRT";
                         }
                     }
@@ -150,6 +154,10 @@ public class ConfigGestion {
 
     public boolean isDirectRename() {
         return directRename;
+    }
+
+    public SoundType getStageSound() {
+        return stageSound;
     }
 
     @Override

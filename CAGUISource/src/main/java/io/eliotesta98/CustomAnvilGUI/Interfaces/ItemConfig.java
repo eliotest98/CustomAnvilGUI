@@ -1,9 +1,9 @@
 package io.eliotesta98.CustomAnvilGUI.Interfaces;
 
+import com.HeroxWar.HeroxCore.MessageGesture;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import de.tr7zw.changeme.nbtapi.NBTItem;
-import io.eliotesta98.CustomAnvilGUI.Utils.ColorUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -15,7 +15,9 @@ import org.bukkit.profile.PlayerTextures;
 import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.UUID;
 
 public class ItemConfig {
 
@@ -68,7 +70,7 @@ public class ItemConfig {
         if (!lore.isEmpty()) {
             ArrayList<String> lorenew = new ArrayList<>();
             for (String lorePart : lore) {
-                lorenew.add(ColorUtils.applyColor(lorePart));
+                lorenew.add(MessageGesture.transformColor(lorePart));
             }
             itemm.setLore(lorenew);
         }
@@ -102,7 +104,7 @@ public class ItemConfig {
         } else {
             newName = name;
         }
-        itemm.setDisplayName(ColorUtils.applyColor(newName));
+        itemm.setDisplayName(MessageGesture.transformColor(newName));
         item.setItemMeta(itemm);
         if (item.getType().toString().equalsIgnoreCase("AIR")) {
             return item;
