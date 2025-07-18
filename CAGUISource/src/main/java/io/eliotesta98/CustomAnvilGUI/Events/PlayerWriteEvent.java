@@ -1,8 +1,8 @@
 package io.eliotesta98.CustomAnvilGUI.Events;
 
+import com.HeroxWar.HeroxCore.MessageGesture;
 import io.eliotesta98.CustomAnvilGUI.Core.Main;
 import io.eliotesta98.CustomAnvilGUI.Interfaces.GuiEvent;
-import io.eliotesta98.CustomAnvilGUI.Utils.ColorUtils;
 import io.eliotesta98.CustomAnvilGUI.Utils.ExpUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -65,11 +65,11 @@ public class PlayerWriteEvent implements Listener {
                         Bukkit.getScheduler().scheduleSyncDelayedTask(Main.instance, () -> GuiEvent.damageAnvil(player, anvilLocation, inv));
                         ExpUtils.changeExpLevels(player, -1);
                     } else {
-                        player.sendMessage(ColorUtils.applyColor(insufficientExp));
+                        MessageGesture.sendMessage(player, insufficientExp);
                     }
                     renamingPlayers.remove(player.getName());
                 } else {
-                    player.sendMessage(ColorUtils.applyColor(successfullyRename));
+                    MessageGesture.sendMessage(player, successfullyRename);
                 }
                 event.setCancelled(true);
             }

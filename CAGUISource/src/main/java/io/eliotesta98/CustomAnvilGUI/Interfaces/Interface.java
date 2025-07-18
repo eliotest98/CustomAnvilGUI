@@ -1,21 +1,19 @@
 package io.eliotesta98.CustomAnvilGUI.Interfaces;
 
+import com.HeroxWar.HeroxCore.MessageGesture;
+import com.HeroxWar.HeroxCore.SoundGesture.SoundType;
 import io.eliotesta98.CustomAnvilGUI.Core.Main;
 import io.eliotesta98.CustomAnvilGUI.Events.PlayerWriteEvent;
-import io.eliotesta98.CustomAnvilGUI.Utils.ColorUtils;
 import io.eliotesta98.CustomAnvilGUI.Utils.ExpUtils;
-import io.eliotesta98.CustomAnvilGUI.Utils.SoundManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.geysermc.cumulus.form.CustomForm;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,7 +21,7 @@ import java.util.Map;
 
 public class Interface {
     private String title, nameInterface, nameInterfaceToOpen, nameInterfaceToReturn;
-    private Sound soundOpen;
+    private SoundType soundOpen;
     private List<String> slots = new ArrayList<>();
     private Map<String, ItemConfig> itemsConfig = new HashMap<>();
     private boolean debug;
@@ -36,8 +34,8 @@ public class Interface {
     private String insufficientExp;
     private boolean directRename;
 
-    public Interface(String title, Sound soundOpen, ArrayList<String> slots, HashMap<String, ItemConfig> itemsConfig, List<FloodgateInput> floodgateInputs, boolean debug, int sizeModifiableSlot, String nameInterface, String nameInterfaceToOpen, String nameInterfaceToReturn) {
-        this.title = title;
+    public Interface(String title, SoundType soundOpen, ArrayList<String> slots, HashMap<String, ItemConfig> itemsConfig, List<FloodgateInput> floodgateInputs, boolean debug, int sizeModifiableSlot, String nameInterface, String nameInterfaceToOpen, String nameInterfaceToReturn) {
+        this.title = MessageGesture.transformColor(title);
         this.soundOpen = soundOpen;
         this.itemsConfig.putAll(itemsConfig);
         this.debug = debug;
@@ -63,11 +61,11 @@ public class Interface {
         this.title = title;
     }
 
-    public Sound getSoundOpen() {
+    public SoundType getSoundOpen() {
         return soundOpen;
     }
 
-    public void setSoundOpen(Sound soundOpen) {
+    public void setSoundOpen(SoundType soundOpen) {
         this.soundOpen = soundOpen;
     }
 
@@ -183,7 +181,7 @@ public class Interface {
         Bukkit.getScheduler().scheduleSyncDelayedTask(Main.instance, () -> {
             Inventory customAnvilInventory = getCustomAnvilInventory(player);
             player.openInventory(customAnvilInventory);
-            SoundManager.playSound(player, soundOpen, 15.0f, 10.0f);
+            soundOpen.playSound(player);
         });
     }
 
@@ -191,7 +189,7 @@ public class Interface {
         if (!Main.floodgateUtils.isBedrockPlayer(player.getUniqueId())) {
             return;
         }
-        SoundManager.playSound(player, soundOpen, 15.0f, 10.0f);
+        soundOpen.playSound(player);
         Main.floodgateUtils.getBedrockPlayer(player.getUniqueId()).sendForm(createCustomForm(player, event).build());
     }
 
@@ -222,12 +220,12 @@ public class Interface {
                             Bukkit.getScheduler().scheduleSyncDelayedTask(Main.instance, () -> GuiEvent.damageAnvil(player, event.getAnvilLocation(), event.getInv()));
                             ExpUtils.changeExpLevels(player, -1);
                         } else {
-                            player.sendMessage(ColorUtils.applyColor(insufficientExp));
+                            MessageGesture.sendMessage(player, insufficientExp);
                         }
                         event.removePlayer(player.getName());
                     } else {
                         event.addPlayer(player.getName(), event.getItemInHand(player.getName()), event.createItemStack(response.asInput(0)));
-                        player.sendMessage(ColorUtils.applyColor(successRename));
+                        MessageGesture.sendMessage(player, successRename);
                     }
                 })
                 .closedResultHandler(() -> event.removePlayer(player.getName()))
@@ -270,7 +268,7 @@ public class Interface {
     }
 
     private Inventory getCustomAnvilInventory(Player player) {
-        CustomAnvilGUIHolder holder = new CustomAnvilGUIHolder(this.getSlots().size(), ColorUtils.applyColor(getTitle()));
+        CustomAnvilGUIHolder holder = new CustomAnvilGUIHolder(this.getSlots().size(), getTitle());
         // prendo l'inventario
         final Inventory inventory = holder.getInventory();
 

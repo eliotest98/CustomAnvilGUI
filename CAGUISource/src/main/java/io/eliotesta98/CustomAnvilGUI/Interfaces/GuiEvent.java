@@ -1,12 +1,12 @@
 package io.eliotesta98.CustomAnvilGUI.Interfaces;
 
+import com.HeroxWar.HeroxCore.MessageGesture;
+import com.HeroxWar.HeroxCore.SoundGesture.SoundType;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import io.eliotesta98.CustomAnvilGUI.Core.Main;
 import io.eliotesta98.CustomAnvilGUI.Events.PlayerWriteEvent;
-import io.eliotesta98.CustomAnvilGUI.Utils.ColorUtils;
 import io.eliotesta98.CustomAnvilGUI.Utils.DebugUtils;
 import io.eliotesta98.CustomAnvilGUI.Utils.ExpUtils;
-import io.eliotesta98.CustomAnvilGUI.Utils.SoundManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -41,6 +41,7 @@ public class GuiEvent implements Listener {
     private final List<String> whitelistedPlayers = new ArrayList<>();
     private final DebugUtils debugUtils = new DebugUtils();
     private static final int percentageDamage = Main.instance.getConfigGestion().getPercentageDamage();
+    private static final SoundType soundType = Main.instance.getConfigGestion().getStageSound();
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onAnvilInventoryOpen(InventoryOpenEvent event) {
@@ -246,7 +247,7 @@ public class GuiEvent implements Listener {
                             } else {
                                 playerWriteEvent.addPlayer(p.getName(), inv.getItem(customInterface.getImportantSlots().get("FirstItem")));
                                 p.closeInventory();
-                                p.sendMessage(ColorUtils.applyColor(renameInfo));
+                                MessageGesture.sendMessage(p,renameInfo);
                             }
                         }
                     }
@@ -347,7 +348,7 @@ public class GuiEvent implements Listener {
                             damageAnvil(p, anvilLocation, inv);
                         }
                     } else {
-                        p.sendMessage(ColorUtils.applyColor(insufficientExp));
+                        MessageGesture.sendMessage(p,insufficientExp);
                     }
                 }
 
@@ -450,7 +451,7 @@ public class GuiEvent implements Listener {
 //                    blockData.setFacingDirection(blockFace);
 //                    ((org.bukkit.material.Directional) anvilLocation.getBlock().getState().getData()).setFacingDirection(blockFace);
 //                }
-                SoundManager.playSound(anvilLocation, SoundManager.getSound("BLOCK_ANVIL_USE"), 100f, 100f);
+                soundType.playSound(anvilLocation);
             } else if (anvilType == Material.CHIPPED_ANVIL) {
                 Directional blockData = (Directional) anvilLocation.getBlock().getBlockData();
                 BlockFace blockFace = blockData.getFacing();
@@ -473,16 +474,16 @@ public class GuiEvent implements Listener {
 //                    blockData.setFacingDirection(blockFace);
 //                    ((org.bukkit.material.Directional) anvilLocation.getBlock().getState().getData()).setFacingDirection(blockFace);
 //                }
-                SoundManager.playSound(anvilLocation, SoundManager.getSound("BLOCK_ANVIL_USE"), 100f, 100f);
+                soundType.playSound(anvilLocation);
             } else if (anvilType == Material.DAMAGED_ANVIL) {
                 anvilLocation.getBlock().setType(Material.AIR);
                 player.closeInventory();
                 Main.instance.getConfigGestion().getInterfaces().get("Anvil")
                         .removeInventory(player.getName(), inventory, player.getLocation(), true);
-                SoundManager.playSound(anvilLocation, SoundManager.getSound("BLOCK_ANVIL_USE"), 100f, 100f);
+                soundType.playSound(anvilLocation);
             }
         } else {
-            SoundManager.playSound(anvilLocation, SoundManager.getSound("BLOCK_ANVIL_USE"), 100f, 100f);
+            soundType.playSound(anvilLocation);
         }
     }
 }

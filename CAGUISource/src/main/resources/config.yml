@@ -17,10 +17,19 @@ Configuration:
   # Configure if you want directly the rename of item or reopen the anvil for rename an item
   DirectRename: false
 
+  # This sound is triggered when an anvil change stage
+  AnvilSound:
+    SoundName: 'minecraft:block.anvil.use'
+    Volume: 100
+    Pitch: 0.6
+
 Interface:
   Anvil:
     Title: "&0Repair & Name"
-    OpenSound: ENTITY_ENDER_DRAGON_FLAP # ENDERDRAGON_WINGS <1.13
+    OpenSound:
+      SoundName: 'minecraft:entity.allay.item_thrown'
+      Volume: 100
+      Pitch: 0.6
     Slots:
       - 'tbbbbbbbx'
       - 'bfbsbebrb'
