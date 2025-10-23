@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.eliotesta98.CustomAnvilGUI</groupId>
     <artifactId>CAGUISource</artifactId>
-    <version>1.5.3</version>
+    <version>1.5.4</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -141,13 +141,13 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.21.8-R0.1-SNAPSHOT</version>
+            <version>1.21.10-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.github.HeroxWar</groupId>
             <artifactId>HeroxCore</artifactId>
-            <version>1.2</version>
+            <version>1.2.5</version>
             <scope>compile</scope>
         </dependency>
         <!-- NBT -->
@@ -170,13 +170,6 @@
                     <artifactId>authlib</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <!-- GameProfile -->
-        <dependency>
-            <groupId>com.mojang</groupId>
-            <artifactId>authlib</artifactId>
-            <version>3.16.29</version>
-            <scope>provided</scope>
         </dependency>
         <!-- Floodgate -->
         <dependency>
