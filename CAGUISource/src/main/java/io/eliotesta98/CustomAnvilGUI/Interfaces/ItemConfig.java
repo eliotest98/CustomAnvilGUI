@@ -1,18 +1,13 @@
 package io.eliotesta98.CustomAnvilGUI.Interfaces;
 
 import com.HeroxWar.HeroxCore.MessageGesture;
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
+import com.HeroxWar.HeroxCore.Utils.Texture;
+import com.HeroxWar.HeroxCore.Utils.TextureException;
 import de.tr7zw.changeme.nbtapi.NBTItem;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.profile.PlayerProfile;
-import org.bukkit.profile.PlayerTextures;
 
-import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -44,26 +39,11 @@ public class ItemConfig {
         }
         if (type.equalsIgnoreCase("PLAYER_HEAD") || type.contains("SKULL")) {
             if (!texture.equalsIgnoreCase("")) {
-                SkullMeta meta = (SkullMeta) item.getItemMeta();
                 try {
-                    PlayerProfile player_profile = Bukkit.createPlayerProfile(RANDOM_UUID);
-                    PlayerTextures textures = player_profile.getTextures();
-                    textures.setSkin(getUrlFromBase64(texture));
-                    player_profile.setTextures(textures);
-                    meta.setOwnerProfile(player_profile);
-                } catch (NoSuchMethodError | MalformedURLException ignored) {
-                    GameProfile profile = new GameProfile(UUID.randomUUID(), "");
-                    profile.getProperties().put("textures", new Property("textures", texture));
-                    Field profileField;
-                    try {
-                        profileField = meta.getClass().getDeclaredField("profile");
-                        profileField.setAccessible(true);
-                        profileField.set(meta, profile);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    Texture.setCustomTexture(item, texture);
+                } catch (TextureException e) {
+                    throw new RuntimeException(e);
                 }
-                item.setItemMeta(meta);
             }
         }
         final ItemMeta itemm = item.getItemMeta();
