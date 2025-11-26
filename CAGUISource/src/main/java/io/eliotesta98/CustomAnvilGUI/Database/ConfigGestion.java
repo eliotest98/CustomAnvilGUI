@@ -22,12 +22,13 @@ public class ConfigGestion {
     private final HashMap<String, Interface> interfaces = new HashMap<>();
     private final SoundType stageSound;
     private final int percentageDamage;
-    private final boolean directRename;
+    private final boolean directRename, onlyBedrock;
 
     public ConfigGestion(FileConfiguration file) {
 
         percentageDamage = file.getInt("Configuration.AnvilDamage.Damage", 12);
         directRename = file.getBoolean("Configuration.DirectRename");
+        onlyBedrock = file.getBoolean("Configuration.OnlyBedrock");
         stageSound = new SoundType(
                 file.getString("Configuration.AnvilSound.SoundName"),
                 file.getDouble("Configuration.AnvilSound.Volume"),
@@ -158,6 +159,10 @@ public class ConfigGestion {
 
     public SoundType getStageSound() {
         return stageSound;
+    }
+
+    public boolean isOnlyBedrock() {
+        return onlyBedrock;
     }
 
     @Override

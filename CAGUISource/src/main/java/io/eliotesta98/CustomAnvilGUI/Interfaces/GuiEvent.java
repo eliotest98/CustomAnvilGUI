@@ -51,8 +51,8 @@ public class GuiEvent implements Listener {
                 debugUtils.addLine("Open Inventory");
                 debugUtils.debug("InventoryOpenEvent");
             }
-            Main.instance.getConfigGestion().getInterfaces().get("Anvil").openInterface((Player) event.getPlayer(), event.getView());
-            event.setCancelled(true);
+            boolean cancelled = Main.instance.getConfigGestion().getInterfaces().get("Anvil").openInterface((Player) event.getPlayer(), event.getView());
+            event.setCancelled(cancelled);
         }
     }
 

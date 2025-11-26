@@ -175,7 +175,13 @@ public class Interface {
         }
     }
 
-    public void openInterface(Player player, InventoryView anvil) {
+    public boolean openInterface(Player player, InventoryView anvil) {
+        if(Main.instance.getConfigGestion().isOnlyBedrock()) {
+            if (!Main.floodgateUtils.isBedrockPlayer(player.getUniqueId())) {
+                //player.openInventory(anvil);
+                return false;
+            }
+        }
         anvilInventories.put(player.getName(), anvil);
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(Main.instance, () -> {
@@ -183,6 +189,7 @@ public class Interface {
             player.openInventory(customAnvilInventory);
             soundOpen.playSound(player);
         });
+        return true;
     }
 
     public void openInterface(Player player, PlayerWriteEvent event) {

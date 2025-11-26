@@ -9,6 +9,10 @@ Configuration:
   Hooks:
     Floodgate: false
 
+  # If you want only bedrock players open the custom anvil gui
+  # P.S. For check this you have to activate the hook of Floodgate!
+  OnlyBedrock: false
+
   # This section is for configuring how much is the possibility of anvil damage at every use.
   # For default, there is 1/8 (12%) possibility to damage the anvil at each use
   AnvilDamage:
