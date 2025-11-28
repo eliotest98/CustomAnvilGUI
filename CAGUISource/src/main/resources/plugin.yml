@@ -3,7 +3,7 @@ version: maven-version-number
 main: io.eliotesta98.CustomAnvilGUI.Core.Main
 api-version: 1.13
 authors: [eliotesta98, xSavior_of_God]
-softdepend: []
+softdepend: [Floodgate, Vault]
 depend: []
 commands:
   customanvilgui:
@@ -14,4 +14,16 @@ permissions:
     default: op
   cagui.command.reload:
     description: /cagui <reload>
+    default: op
+  cagui.fix.hand:
+    description: for fix item in hand
+    default: op
+  cagui.fix.inventory:
+    description: for fix all items in the inventory
+    default: op
+  cagui.fix.hand.bypass:
+    description: for bypass the costs of fix item in hand
+    default: op
+  cagui.fix.inventory.bypass:
+    description: for bypass the costs of fix inventory
     default: op

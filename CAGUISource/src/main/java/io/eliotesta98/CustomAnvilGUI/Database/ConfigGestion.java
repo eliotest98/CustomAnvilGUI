@@ -3,6 +3,7 @@ package io.eliotesta98.CustomAnvilGUI.Database;
 import com.HeroxWar.HeroxCore.MessageGesture;
 import com.HeroxWar.HeroxCore.SoundGesture.SoundType;
 import io.eliotesta98.CustomAnvilGUI.Core.Main;
+import io.eliotesta98.CustomAnvilGUI.Database.Objects.PaymentConfig;
 import io.eliotesta98.CustomAnvilGUI.Interfaces.FloodgateInput;
 import io.eliotesta98.CustomAnvilGUI.Interfaces.Interface;
 import io.eliotesta98.CustomAnvilGUI.Interfaces.ItemConfig;
@@ -22,25 +23,10 @@ public class ConfigGestion {
     private final HashMap<String, Interface> interfaces = new HashMap<>();
     private final SoundType stageSound;
     private final int percentageDamage;
-    private final boolean directRename;
+    private final boolean directRename, onlyBedrock;
+    private final PaymentConfig fixHandPayment, fixInventoryPayment;
 
     public ConfigGestion(FileConfiguration file) {
-
-        percentageDamage = file.getInt("Configuration.AnvilDamage.Damage", 12);
-        directRename = file.getBoolean("Configuration.DirectRename");
-        stageSound = new SoundType(
-                file.getString("Configuration.AnvilSound.SoundName"),
-                file.getDouble("Configuration.AnvilSound.Volume"),
-                file.getDouble("Configuration.AnvilSound.Pitch")
-        );
-
-        for (String event : file.getConfigurationSection("Debug").getKeys(false)) {
-            debug.put(event, file.getBoolean("Debug." + event));
-        }
-
-        for (String hook : file.getConfigurationSection("Configuration.Hooks").getKeys(false)) {
-            hooks.put(hook, file.getBoolean("Configuration.Hooks." + hook));
-        }
 
         String prefix = "";
         for (String message : file.getConfigurationSection("Messages").getKeys(false)) {
@@ -69,6 +55,44 @@ public class ConfigGestion {
             }
         }
 
+        for (String event : file.getConfigurationSection("Debug").getKeys(false)) {
+            debug.put(event, file.getBoolean("Debug." + event));
+        }
+
+        for (String hook : file.getConfigurationSection("Configuration.Hooks").getKeys(false)) {
+            hooks.put(hook, file.getBoolean("Configuration.Hooks." + hook));
+        }
+
+        percentageDamage = file.getInt("Configuration.AnvilDamage.Damage", 12);
+        directRename = file.getBoolean("Configuration.DirectRename");
+        onlyBedrock = file.getBoolean("Configuration.OnlyBedrock");
+        stageSound = new SoundType(
+                file.getString("Configuration.AnvilSound.SoundName"),
+                file.getDouble("Configuration.AnvilSound.Volume"),
+                file.getDouble("Configuration.AnvilSound.Pitch")
+        );
+
+        String messageNotEnoughMaterial = messages.get("Errors.NotEnoughMaterial");
+        String messageNotEnoughExperience = messages.get("Errors.NotEnoughExperience");
+        String messageNotEnoughMoney = messages.get("Errors.NotEnoughMoney");
+        boolean vaultEnable = hooks.get("Vault");
+
+        fixHandPayment = new PaymentConfig(
+                file.getBoolean("Configuration.FixItems.Hand.Payment.Enabled"),
+                file.getDouble("Configuration.FixItems.Hand.Payment.Price"),
+                file.getString("Configuration.FixItems.Hand.Payment.Type"),
+                file.getString("Configuration.FixItems.Hand.Payment.Calculation"),
+                messageNotEnoughMoney, messageNotEnoughMaterial,
+                messageNotEnoughExperience, vaultEnable, "cagui.fix.hand.bypass");
+
+        fixInventoryPayment = new PaymentConfig(
+                file.getBoolean("Configuration.FixItems.Inventory.Payment.Enabled"),
+                file.getDouble("Configuration.FixItems.Inventory.Payment.Price"),
+                file.getString("Configuration.FixItems.Inventory.Payment.Type"),
+                file.getString("Configuration.FixItems.Inventory.Payment.Calculation"),
+                messageNotEnoughMoney, messageNotEnoughMaterial,
+                messageNotEnoughExperience, vaultEnable, "cagui.fix.inventory.bypass");
+
         for (String nameInterface : file.getConfigurationSection("Interface").getKeys(false)) {
             String title = file.getString("Interface." + nameInterface + ".Title");
             String rawSound = file.getString("Interface." + nameInterface + ".OpenSound.SoundName", "minecraft:entity.allay.item_thrown");
@@ -79,14 +103,16 @@ public class ConfigGestion {
             ArrayList<String> contaSlots = new ArrayList<>();
 
             List<FloodgateInput> inputs = new ArrayList<>();
-            for (String number : file.getConfigurationSection("Interface." + nameInterface + ".Floodgate").getKeys(false)) {
-                String base = "Interface." + nameInterface + ".Floodgate." + number;
-                FloodgateInput floodgateInput = new FloodgateInput(
-                        file.getString(base + ".Type"),
-                        file.getString(base + ".Label"),
-                        file.getString(base + ".Placeholder", ""),
-                        file.getString(base + ".DefaultText", ""));
-                inputs.add(floodgateInput);
+            if (file.isConfigurationSection("Interface." + nameInterface + ".Floodgate")) {
+                for (String number : file.getConfigurationSection("Interface." + nameInterface + ".Floodgate").getKeys(false)) {
+                    String base = "Interface." + nameInterface + ".Floodgate." + number;
+                    FloodgateInput floodgateInput = new FloodgateInput(
+                            file.getString(base + ".Type"),
+                            file.getString(base + ".Label"),
+                            file.getString(base + ".Placeholder", ""),
+                            file.getString(base + ".DefaultText", ""));
+                    inputs.add(floodgateInput);
+                }
             }
 
             HashMap<String, ItemConfig> itemsConfig = new HashMap<>();
@@ -158,6 +184,18 @@ public class ConfigGestion {
 
     public SoundType getStageSound() {
         return stageSound;
+    }
+
+    public boolean isOnlyBedrock() {
+        return onlyBedrock;
+    }
+
+    public PaymentConfig getFixHandPayment() {
+        return fixHandPayment;
+    }
+
+    public PaymentConfig getFixInventoryPayment() {
+        return fixInventoryPayment;
     }
 
     @Override

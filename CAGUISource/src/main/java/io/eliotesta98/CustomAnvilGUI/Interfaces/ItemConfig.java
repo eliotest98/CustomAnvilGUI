@@ -8,19 +8,15 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Base64;
-import java.util.UUID;
+import java.util.List;
 
 public class ItemConfig {
 
-    private static final UUID RANDOM_UUID = UUID.fromString("92864445-51c5-4c3b-9039-517c9927d1b4");
     private String name, type, texture, soundClick, nameItemConfig;
-    private ArrayList<String> lore;
+    private List<String> lore;
 
-    public ItemConfig(String nameItemConfig, String name, String type, String texture, ArrayList<String> lore, String soundClick) {
+    public ItemConfig(String nameItemConfig, String name, String type, String texture, List<String> lore, String soundClick) {
         this.name = name;
         this.type = type;
         this.texture = texture;
@@ -30,6 +26,10 @@ public class ItemConfig {
     }
 
     public ItemStack createItemConfig(String currentInterface, String nbt, int positionItem) {
+        String[] nbtList = new String[]{};
+        if (!nbt.equalsIgnoreCase("")) {
+            nbtList = nbt.split(";");
+        }
         ItemStack item;
         if (!type.contains(";"))// controllo la versione per settare l'item
             item = new ItemStack(Material.getMaterial(type));
@@ -50,39 +50,34 @@ public class ItemConfig {
         if (!lore.isEmpty()) {
             ArrayList<String> lorenew = new ArrayList<>();
             for (String lorePart : lore) {
-                lorenew.add(MessageGesture.transformColor(lorePart));
+                lorenew.add(MessageGesture.transformColor(lorePart)
+                        .replace("{priceHand}", nbtList[0].split(":")[1])
+                        .replace("{priceInventory}", nbtList[1].split(":")[1])
+                );
             }
             itemm.setLore(lorenew);
         }
-        String newName;
+        String newName = name;
         if (name.contains("{exp}")) {
             String cost = "";
-            if (!nbt.equalsIgnoreCase("")) {
-                String[] nbtList = nbt.split(";");
-                for (String nbtString : nbtList) {
-                    String[] nbtSplit = nbtString.split(":");
-                    if (nbtSplit[0].equalsIgnoreCase("ap.experience")) {
-                        cost = nbtSplit[1];
-                        break;
-                    }
+            for (String nbtString : nbtList) {
+                String[] nbtSplit = nbtString.split(":");
+                if (nbtSplit[0].equalsIgnoreCase("ap.experience")) {
+                    cost = nbtSplit[1];
+                    break;
                 }
             }
             newName = name.replace("{exp}", cost);
         } else if (name.contains("{message}")) {
             String message = "";
-            if (!nbt.equalsIgnoreCase("")) {
-                String[] nbtList = nbt.split(";");
-                for (String nbtString : nbtList) {
-                    String[] nbtSplit = nbtString.split(":");
-                    if (nbtSplit[0].equalsIgnoreCase("ap.message")) {
-                        message = nbtSplit[1];
-                        break;
-                    }
+            for (String nbtString : nbtList) {
+                String[] nbtSplit = nbtString.split(":");
+                if (nbtSplit[0].equalsIgnoreCase("ap.message")) {
+                    message = nbtSplit[1];
+                    break;
                 }
             }
             newName = name.replace("{message}", message);
-        } else {
-            newName = name;
         }
         itemm.setDisplayName(MessageGesture.transformColor(newName));
         item.setItemMeta(itemm);
@@ -90,16 +85,13 @@ public class ItemConfig {
             return item;
         }
         NBTItem nbtItem = new NBTItem(item);
-        if (!nbt.equalsIgnoreCase("")) {
-            String[] nbtList = nbt.split(";");
-            for (String nbtString : nbtList) {
-                String[] nbtSplit = nbtString.split(":");
-                try {
-                    int numberPage = Integer.parseInt(nbtSplit[1]);
-                    nbtItem.setInteger(nbtSplit[0], numberPage);
-                } catch (Exception ex) {
-                    nbtItem.setString(nbtSplit[0], nbtSplit[1]);
-                }
+        for (String nbtString : nbtList) {
+            String[] nbtSplit = nbtString.split(":");
+            try {
+                int numberPage = Integer.parseInt(nbtSplit[1]);
+                nbtItem.setInteger(nbtSplit[0], numberPage);
+            } catch (Exception ex) {
+                nbtItem.setString(nbtSplit[0], nbtSplit[1]);
             }
         }
         nbtItem.setInteger("ap.positionItem", positionItem);
@@ -131,7 +123,7 @@ public class ItemConfig {
         this.texture = texture;
     }
 
-    public ArrayList<String> getLore() {
+    public List<String> getLore() {
         return lore;
     }
 
@@ -153,13 +145,6 @@ public class ItemConfig {
 
     public void setNameItemConfig(String nameItemConfig) {
         this.nameItemConfig = nameItemConfig;
-    }
-
-    public static URL getUrlFromBase64(String base64) throws MalformedURLException {
-        String decoded = new String(Base64.getDecoder().decode(base64));
-        // We simply remove the "beginning" and "ending" part of the JSON, so we're left with only the URL. You could use a proper
-        // JSON parser for this, but that's not worth it. The String will always start exactly with this stuff anyway
-        return new URL(decoded.substring("{\"textures\":{\"SKIN\":{\"url\":\"".length(), decoded.length() - "\"}}}".length()));
     }
 
     @Override

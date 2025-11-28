@@ -4,6 +4,7 @@ import com.HeroxWar.HeroxCore.MessageGesture;
 import com.HeroxWar.HeroxCore.SoundGesture.SoundType;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import io.eliotesta98.CustomAnvilGUI.Core.Main;
+import io.eliotesta98.CustomAnvilGUI.Database.Objects.PaymentConfig;
 import io.eliotesta98.CustomAnvilGUI.Events.PlayerWriteEvent;
 import io.eliotesta98.CustomAnvilGUI.Utils.DebugUtils;
 import io.eliotesta98.CustomAnvilGUI.Utils.ExpUtils;
@@ -36,6 +37,10 @@ public class GuiEvent implements Listener {
     private final PlayerWriteEvent playerWriteEvent = new PlayerWriteEvent();
     private final boolean debugGui = Main.instance.getConfigGestion().getDebug().get("ClickGui");
     private final String insufficientExp = Main.instance.getConfigGestion().getMessages().get("Errors.InsufficientExperience");
+    private final String insufficientPermission = Main.instance.getConfigGestion().getMessages().get("Errors.InsufficientPermission");
+    private final String noItemInHand = Main.instance.getConfigGestion().getMessages().get("Errors.NoItemInHand");
+    private final PaymentConfig fixHandPayment = Main.instance.getConfigGestion().getFixHandPayment();
+    private final PaymentConfig fixInventoryPayment = Main.instance.getConfigGestion().getFixInventoryPayment();
     private final String renameInfo = Main.instance.getConfigGestion().getMessages().get("Info.Rename");
     private final String guiInsufficientExp = Main.instance.getConfigGestion().getMessages().get("Results.NoItem");
     private final List<String> whitelistedPlayers = new ArrayList<>();
@@ -51,8 +56,8 @@ public class GuiEvent implements Listener {
                 debugUtils.addLine("Open Inventory");
                 debugUtils.debug("InventoryOpenEvent");
             }
-            Main.instance.getConfigGestion().getInterfaces().get("Anvil").openInterface((Player) event.getPlayer(), event.getView());
-            event.setCancelled(true);
+            boolean cancelled = Main.instance.getConfigGestion().getInterfaces().get("Anvil").openInterface((Player) event.getPlayer(), event.getView());
+            event.setCancelled(cancelled);
         }
     }
 
@@ -247,7 +252,7 @@ public class GuiEvent implements Listener {
                             } else {
                                 playerWriteEvent.addPlayer(p.getName(), inv.getItem(customInterface.getImportantSlots().get("FirstItem")));
                                 p.closeInventory();
-                                MessageGesture.sendMessage(p,renameInfo);
+                                MessageGesture.sendMessage(p, renameInfo);
                             }
                         }
                     }
@@ -256,19 +261,62 @@ public class GuiEvent implements Listener {
                 else if (nameItemConfig.equalsIgnoreCase("Fix")) {
                     // Fix the single item in the main hand
                     if (clickType == ClickType.LEFT) {
-                        ItemStack itemStack = p.getInventory().getItemInHand();
-                        if (itemStack.getItemMeta() instanceof Damageable) {
-                            Damageable itemMeta = (Damageable) itemStack.getItemMeta();
-                            itemMeta.setDamage(0);
-                            itemStack.setItemMeta(itemMeta);
-                            damageAnvil(p, anvilLocation, inv);
+                        if (!p.hasPermission("cagui.fix.hand")) {
+                            p.closeInventory();
+                            MessageGesture.sendMessage(p, insufficientPermission);
+                            return;
                         }
+                        ItemStack itemStack = p.getInventory().getItemInHand();
+                        // check if is air
+                        if (itemStack.getType() == Material.AIR) {
+                            p.closeInventory();
+                            MessageGesture.sendMessage(p, noItemInHand);
+                        }
+                        // check if is an item with durability
+                        if (!(itemStack.getItemMeta() instanceof Damageable)) {
+                            return;
+                        }
+                        // check for the payment
+                        Damageable itemMeta = (Damageable) itemStack.getItemMeta();
+                        int damage = itemMeta.getDamage();
+
+                        if (damage == 0) {
+                            return;
+                        }
+
+                        boolean payed = fixHandPayment.customPay(p, itemMeta.getDamage(), 1);
+                        if (!payed) {
+                            return;
+                        }
+                        // restore the damage to item
+                        itemMeta.setDamage(0);
+                        itemStack.setItemMeta(itemMeta);
+                        damageAnvil(p, anvilLocation, inv);
                     }
                     // Fix all items in the player inventory
                     else {
+                        if (!p.hasPermission("cagui.fix.inventory")) {
+                            p.closeInventory();
+                            MessageGesture.sendMessage(p, insufficientPermission);
+                            return;
+                        }
                         for (ItemStack itemStack : p.getInventory().getStorageContents()) {
                             if (itemStack != null && itemStack.getItemMeta() instanceof Damageable) {
+                                // check if is air
+                                if (itemStack.getType() == Material.AIR) {
+                                    continue;
+                                }
                                 Damageable itemMeta = (Damageable) itemStack.getItemMeta();
+                                int damage = itemMeta.getDamage();
+                                if (damage == 0) {
+                                    continue;
+                                }
+
+                                boolean payed = fixInventoryPayment.customPay(p, damage, 1);
+                                if (!payed) {
+                                    break;
+                                }
+                                // restore the damage to item
                                 itemMeta.setDamage(0);
                                 itemStack.setItemMeta(itemMeta);
                                 damageAnvil(p, anvilLocation, inv);
@@ -348,7 +396,7 @@ public class GuiEvent implements Listener {
                             damageAnvil(p, anvilLocation, inv);
                         }
                     } else {
-                        MessageGesture.sendMessage(p,insufficientExp);
+                        MessageGesture.sendMessage(p, insufficientExp);
                     }
                 }
 

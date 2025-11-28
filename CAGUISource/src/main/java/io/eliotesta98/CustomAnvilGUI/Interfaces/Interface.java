@@ -14,6 +14,7 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.geysermc.cumulus.form.CustomForm;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -175,7 +176,13 @@ public class Interface {
         }
     }
 
-    public void openInterface(Player player, InventoryView anvil) {
+    public boolean openInterface(Player player, InventoryView anvil) {
+        if (Main.instance.getConfigGestion().isOnlyBedrock()) {
+            if (!Main.floodgateUtils.isBedrockPlayer(player.getUniqueId())) {
+                //player.openInventory(anvil);
+                return false;
+            }
+        }
         anvilInventories.put(player.getName(), anvil);
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(Main.instance, () -> {
@@ -183,6 +190,7 @@ public class Interface {
             player.openInventory(customAnvilInventory);
             soundOpen.playSound(player);
         });
+        return true;
     }
 
     public void openInterface(Player player, PlayerWriteEvent event) {
@@ -288,6 +296,11 @@ public class Interface {
                     importantSlots.putIfAbsent(itemsConfig.get(slot).getNameItemConfig(), i);
                     importantSlotsLetter.putIfAbsent(itemsConfig.get(slot).getNameItemConfig(), slot);
                     inventory.setItem(i, getItemsConfig().get(slot).createItemConfig(getNameInterface(), "ap.message: ", i));
+                } else if (itemsConfig.get(slot).getNameItemConfig().equalsIgnoreCase("Fix")) {
+                    inventory.setItem(i,
+                            getItemsConfig().get(slot).createItemConfig(getNameInterface(),
+                                    "ap.priceHand:" + Main.instance.getConfigGestion().getFixHandPayment().calculatePrice(player, true) +
+                                            ";ap.priceInventory:" + Main.instance.getConfigGestion().getFixHandPayment().calculatePrice(player, false), i));
                 } else if (itemsConfig.get(slot).getNameItemConfig().equalsIgnoreCase("Cost")) {
                     importantSlots.putIfAbsent(itemsConfig.get(slot).getNameItemConfig(), i);
                     importantSlotsLetter.putIfAbsent(itemsConfig.get(slot).getNameItemConfig(), slot);
