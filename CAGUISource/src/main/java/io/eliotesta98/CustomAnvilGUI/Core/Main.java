@@ -7,6 +7,7 @@ import io.eliotesta98.CustomAnvilGUI.Database.ConfigGestion;
 import io.eliotesta98.CustomAnvilGUI.Interfaces.GuiEvent;
 import io.eliotesta98.CustomAnvilGUI.Interfaces.Interface;
 import io.eliotesta98.CustomAnvilGUI.Module.Floodgate.FloodgateUtils;
+import io.eliotesta98.CustomAnvilGUI.Module.Vault.VaultUtils;
 import io.eliotesta98.CustomAnvilGUI.Utils.DebugUtils;
 import io.eliotesta98.CustomAnvilGUI.Utils.Library;
 import io.eliotesta98.CustomAnvilGUI.Utils.Metrics;
@@ -125,10 +126,26 @@ public class Main extends JavaPlugin {
             if (getConfigGestion().getHooks().get("Floodgate")) {
                 try {
                     floodgateUtils.initialize();
-                    MessageGesture.sendMessage(Main.instance.getServer().getConsoleSender(), "&fFloodgate&a hooked!");
+                    MessageGesture.sendMessage(Bukkit.getConsoleSender(), "&a[CAGUI] §7Added compatibility with Floodgate.");
                 } catch (Exception e) {
                     MessageGesture.sendMessage(Main.instance.getServer().getConsoleSender(), "&cSomething went wrong while adding compatibility to &eFloodgate&c! &f" + e.getMessage());
                 }
+            }
+            /*if (getConfigGestion().getHooks().get("AdvancedEnchantments")) {
+                if (Bukkit.getPluginManager().isPluginEnabled("AdvancedEnchantments")) {
+                    MessageGesture.sendMessage(Main.instance.getServer().getConsoleSender(), "&fAdvancedEnchantments&a hooked!");
+                } else {
+                    getConfigGestion().getHooks().replace("AdvancedEnchantments", false);
+                }
+            }*/
+            if (getServer().getPluginManager().isPluginEnabled("Vault")) {
+                if (getConfigGestion().getHooks().get("Vault")) {
+                    if (VaultUtils.setupEconomy()) {
+                        MessageGesture.sendMessage(Bukkit.getConsoleSender(), "&a[CAGUI] §7Added compatibility with Vault.");
+                    }
+                }
+            } else {
+                getConfigGestion().getHooks().replace("Vault", false);
             }
         });
 

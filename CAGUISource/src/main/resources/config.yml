@@ -8,6 +8,7 @@
 Configuration:
   Hooks:
     Floodgate: false
+    Vault: false
 
   # If you want only bedrock players open the custom anvil gui
   # P.S. For check this you have to activate the hook of Floodgate!
@@ -26,6 +27,32 @@ Configuration:
     SoundName: 'minecraft:block.anvil.use'
     Volume: 100
     Pitch: 0.6
+
+  FixItems:
+    Hand:
+      # If you want a payment for the fix hand (PS: Enable Vault Dependency for use economy payment)
+      Payment:
+        Enabled: false
+        Price: 1.0
+        # The type of payment (Material, Experience, Money)
+        # Type: "Material:COBBLESTONE"
+        # Type: "Experience" (levels)
+        # Type: "Money" (you need to activate Vault compatibility)
+        Type: "Money"
+        # Formula for calculate the final price (PS: You can use only this operation: + - * / and only one type of operation!)
+        Calculation: "{price} * {durability}"
+    Inventory:
+      # If you want a payment for the fix inventory (PS: Enable Vault Dependency for use economy payment)
+      Payment:
+        Enabled: false
+        Price: 1.0
+        # The type of payment (Material, Experience, Money)
+        # Type: "Material:COBBLESTONE"
+        # Type: "Experience" (levels)
+        # Type: "Money" (you need to activate Vault compatibility)
+        Type: "Money"
+        # Formula for calculate the final price (PS: You can use only this operation: + - * / and only one type of operation!)
+        Calculation: "{price} * {durability}"
 
 Interface:
   Anvil:
@@ -95,8 +122,8 @@ Interface:
         Texture: ''
         Lore:
           - "&bRepair items in your inventory"
-          - "&b&l> &bLeft Click: repair the item in your main hand"
-          - "&b&l> &bRight Click: repair all items in your inventory"
+          - "&b&l> &bLeft Click: repair the item in your main hand {priceHand}$"
+          - "&b&l> &bRight Click: repair all items in your inventory {priceInventory}$"
         SoundClick: ''
       Border:
         Letter: 'b'
@@ -141,6 +168,10 @@ Messages:
     CommandNotFound: '{prefix}&cCommand not found'
     InsufficientPermission: '{prefix}&cInsufficient permission'
     InsufficientExperience: '{prefix}&cHEY! &7You don''t have much experience for enchant this items!'
+    NoItemInHand: '{prefix}&cHEY! &7You don''t have an item in hand for make this action!'
+    NotEnoughMoney: '{prefix}&cHEY! &7You don''t have enough money!'
+    NotEnoughExperience: '{prefix}&cHEY! &7You don''t have enough experience!'
+    NotEnoughMaterial: '{prefix}&cHEY! &7You don''t have enough material!'
 
 Debug:
   # Commands execution
