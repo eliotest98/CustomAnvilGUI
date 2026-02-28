@@ -12,13 +12,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.geysermc.cumulus.form.CustomForm;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Interface {
     private String title, nameInterface, nameInterfaceToOpen, nameInterfaceToReturn;
@@ -250,10 +248,21 @@ public class Interface {
         inventory.setItem(slot, this.itemsConfig.get(importantSlotsLetter.get("Border")).createItemConfig(this.getNameInterface(), "", slot));
     }
 
-    public void deleteItemsWhenResult(Inventory inventory) {
+    public void deleteItemsWhenResult(Inventory inventory, Player player) {
         int slotToChange = importantSlots.get("FirstItem");
+        ItemStack firstSlot = inventory.getItem(slotToChange).clone();
         inventory.setItem(slotToChange, null);
         slotToChange = importantSlots.get("SecondItem");
+        ItemStack secondSlot = inventory.getItem(slotToChange);
+        if (secondSlot.getAmount() > 1) {
+            int numberOfItemsForRepair = calculate25PercentForRepair(firstSlot);
+            secondSlot.setAmount(secondSlot.getAmount() - numberOfItemsForRepair);
+            if (player.getInventory().firstEmpty() != -1) {
+                player.getInventory().addItem(secondSlot);
+            } else {
+                player.getWorld().dropItem(player.getLocation(), secondSlot);
+            }
+        }
         inventory.setItem(slotToChange, null);
     }
 
@@ -332,4 +341,17 @@ public class Interface {
         return inventory;
     }
 
+    private int calculate25PercentForRepair(ItemStack firstItem) {
+        short maxItemDamage = firstItem.getType().getMaxDurability();
+        int damage25Percent = maxItemDamage / 4;
+        int count = 0;
+        if (firstItem.getItemMeta() instanceof Damageable) {
+            int itemDurability = ((Damageable) firstItem.getItemMeta()).getDamage();
+            while (itemDurability > 0) {
+                itemDurability = itemDurability - damage25Percent;
+                count++;
+            }
+        }
+        return count;
+    }
 }

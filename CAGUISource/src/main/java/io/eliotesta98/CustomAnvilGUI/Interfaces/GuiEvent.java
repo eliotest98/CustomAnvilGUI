@@ -392,7 +392,7 @@ public class GuiEvent implements Listener {
                             }
                             customInterface.setBarrier(inv, " ");
                             customInterface.setBorder(inv, customInterface.getImportantSlots().get("Cost"));
-                            customInterface.deleteItemsWhenResult(inv);
+                            customInterface.deleteItemsWhenResult(inv, p);
                             damageAnvil(p, anvilLocation, inv);
                         }
                     } else {
