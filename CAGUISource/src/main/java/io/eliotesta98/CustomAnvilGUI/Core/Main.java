@@ -1,22 +1,20 @@
 package io.eliotesta98.CustomAnvilGUI.Core;
 
-import com.HeroxWar.HeroxCore.CommentedConfiguration;
-import com.HeroxWar.HeroxCore.MessageGesture;
+import com.HeroxWar.HeroxCore.MessageGesture.MessageGesturePaper;
+import com.HeroxWar.HeroxCore.Utils.Library;
+import com.HeroxWar.HeroxCore.Utils.Metrics;
+import com.HeroxWar.HeroxCore.Utils.UpdateChecker;
+import com.HeroxWar.HeroxCore.Utils.Version;
 import io.eliotesta98.CustomAnvilGUI.Commands.Commands;
+import io.eliotesta98.CustomAnvilGUI.Commands.TabCommands;
 import io.eliotesta98.CustomAnvilGUI.Database.ConfigGestion;
 import io.eliotesta98.CustomAnvilGUI.Interfaces.GuiEvent;
 import io.eliotesta98.CustomAnvilGUI.Interfaces.Interface;
 import io.eliotesta98.CustomAnvilGUI.Module.Floodgate.FloodgateUtils;
 import io.eliotesta98.CustomAnvilGUI.Module.Vault.VaultUtils;
-import io.eliotesta98.CustomAnvilGUI.Utils.DebugUtils;
-import io.eliotesta98.CustomAnvilGUI.Utils.Library;
-import io.eliotesta98.CustomAnvilGUI.Utils.Metrics;
-import io.eliotesta98.CustomAnvilGUI.Utils.UpdateChecker;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,97 +25,59 @@ public class Main extends JavaPlugin {
     public static Main instance;
     public static FloodgateUtils floodgateUtils;
     private ConfigGestion config;
+    public static MessageGesturePaper messageGesturePaper;
+    private List<String> libraryLegacyMessages = new ArrayList<>();
+    public static Version version;
 
     @Override
     public void onLoad() {
         instance = this;
         floodgateUtils = new FloodgateUtils();
+        version = new Version();
         // Load libraries where Spigot does not do this automatically
-        //loadLibraries();
+        libraryLegacyMessages = loadLibraries();
     }
 
     public void onEnable() {
-        DebugUtils debugsistem = new DebugUtils();
-        long tempo = System.currentTimeMillis();
         int pluginId = 25649;
-
-        getServer().getConsoleSender()
-                .sendMessage("\r\n \r\n \r\n §a #####      #      #####   #     #  ### \n" +
-                        "§a #     #    # #    #     #  #     #   #  \n" +
-                        "§a #         #   #   #        #     #   #  \n" +
-                        "§a #        #     #  #  ####  #     #   #  \n" +
-                        "§a #        #######  #     #  #     #   #  \n" +
-                        "§a #     #  #     #  #     #  #     #   #  \n" +
-                        "§a  #####   #     #   #####    #####   ### " +
-                        "                                   \n\n"
-                        + "§e  Version " + getDescription().getVersion() + " \r\n"
-                        + "§e© Developed by §feliotesta98 & xSavior_of_God §ewith §4<3 \r\n \r\n");
-
         new Metrics(this, pluginId);
-        this.getServer().getConsoleSender().sendMessage("§6Loading config...");
-        File configFile = new File(this.getDataFolder(), "config.yml");
 
-        if (!configFile.exists()) {
-            InputStream inputStream = null;
-            OutputStream outputStream = null;
-            try {
+        messageGesturePaper = new MessageGesturePaper(true, false, instance);
 
-                this.saveResource("config.yml", false);
-                inputStream = this.getResource("config.yml");
-
-                // write the inputStream to a FileOutputStream
-                outputStream = new FileOutputStream(configFile);
-
-                int read = 0;
-                byte[] bytes = new byte[1024];
-
-                while ((read = inputStream.read(bytes)) != -1) {
-                    outputStream.write(bytes, 0, read);
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                Bukkit.getServer().getLogger().severe(ChatColor.RED + "Could not create config.yml!");
-            } finally {
-                if (inputStream != null) {
-                    try {
-                        inputStream.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                if (outputStream != null) {
-                    try {
-                        // outputStream.flush();
-                        outputStream.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                }
-            }
+        for(String message: libraryLegacyMessages) {
+            messageGesturePaper.sendMessage(message);
         }
+        libraryLegacyMessages.clear();
 
-        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(configFile);
+        messageGesturePaper
+                .sendMessage("\r\n \r\n \r\n &a #####      #      #####   #     #  ### \n" +
+                        "&a #     #    # #    #     #  #     #   #  \n" +
+                        "&a #         #   #   #        #     #   #  \n" +
+                        "&a #        #     #  #  ####  #     #   #  \n" +
+                        "&a #        #######  #     #  #     #   #  \n" +
+                        "&a #     #  #     #  #     #  #     #   #  \n" +
+                        "&a  #####   #     #   #####    #####   ### " +
+                        "                                   \n\n"
+                        + "&e  Version " + getDescription().getVersion() + " \r\n"
+                        + "&e© Developed by &feliotesta98 & xSavior_of_God &ewith &4<3 \r\n \r\n");
 
-        try {
-            String configname;
-
-            configname = "config.yml";
-
-            String splits = "Configuration.Auto_selling.Timer:Configuration.Prices";
-            String[] strings = splits.split(":");
-            cfg.syncWithConfig(configFile, this.getResource(configname), strings);
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (version.isInRange(8, 12)) {
+            messageGesturePaper.sendMessage("&6Server version registered < 1.13");
+        } else {
+            messageGesturePaper.sendMessage("&6Server version registered > 1.12");
         }
+        messageGesturePaper.sendMessage("Version Detected: &c" + version.getFormattedServerVersion());
 
-        config = new ConfigGestion(YamlConfiguration.loadConfiguration(configFile));
-        getServer().getConsoleSender().sendMessage("§aConfiguration Loaded!");
+        messageGesturePaper.sendMessage("&6Loading config...");
+
+        config = new ConfigGestion(this.getDataFolder().getPath(), "config.yml",
+                "Configuration.Auto_selling.Timer",
+                "Configuration.Prices");
+        messageGesturePaper.sendMessage("&aConfiguration Loaded!");
 
         new UpdateChecker(instance, 116411).getVersion(version1 -> {
             if (!instance.getDescription().getVersion().equals(version1)) {
-                getServer().getConsoleSender().sendMessage(ChatColor.RED + "New Update available for CustomAnvilGUI!");
+                messageGesturePaper.sendMessage("&cNew Update available for CustomAnvilGUI!");
             }
         });
 
@@ -126,9 +86,9 @@ public class Main extends JavaPlugin {
             if (getConfigGestion().getHooks().get("Floodgate")) {
                 try {
                     floodgateUtils.initialize();
-                    MessageGesture.sendMessage(Bukkit.getConsoleSender(), "&a[CAGUI] §7Added compatibility with Floodgate.");
+                    messageGesturePaper.sendMessage("&7Added compatibility with Floodgate.");
                 } catch (Exception e) {
-                    MessageGesture.sendMessage(Main.instance.getServer().getConsoleSender(), "&cSomething went wrong while adding compatibility to &eFloodgate&c! &f" + e.getMessage());
+                    messageGesturePaper.sendMessage("&cSomething went wrong while adding compatibility to &eFloodgate&c! &f" + e.getMessage());
                 }
             }
             /*if (getConfigGestion().getHooks().get("AdvancedEnchantments")) {
@@ -141,7 +101,7 @@ public class Main extends JavaPlugin {
             if (getServer().getPluginManager().isPluginEnabled("Vault")) {
                 if (getConfigGestion().getHooks().get("Vault")) {
                     if (VaultUtils.setupEconomy()) {
-                        MessageGesture.sendMessage(Bukkit.getConsoleSender(), "&a[CAGUI] §7Added compatibility with Vault.");
+                        messageGesturePaper.sendMessage("&7Added compatibility with Vault.");
                     }
                 }
             } else {
@@ -151,23 +111,13 @@ public class Main extends JavaPlugin {
 
         Bukkit.getServer().getPluginManager().registerEvents(new GuiEvent(), this);
         getCommand("customanvilgui").setExecutor(new Commands());
-
-        if (config.getDebug().get("Enabled")) {
-            debugsistem.addLine("Enabled execution time= " + (System.currentTimeMillis() - tempo));
-            debugsistem.debug("Enabled");
-        }
+        getCommand("customanvilgui").setTabCompleter(new TabCommands());
     }
 
     public void onDisable() {
-        DebugUtils debugsistem = new DebugUtils();
-        long tempo = System.currentTimeMillis();
-        Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "CustomAnvilGUI has been disabled, §cBye bye! §e:(");
+        messageGesturePaper.sendMessage("&aCustomAnvilGUI has been disabled, &cBye bye! §e:(");
         for (Map.Entry<String, Interface> inventory : Main.instance.getConfigGestion().getInterfaces().entrySet()) {
             inventory.getValue().closeAllInventories();
-        }
-        if (config.getDebug().get("Disabled")) {
-            debugsistem.addLine("Disabled execution time= " + (System.currentTimeMillis() - tempo));
-            debugsistem.debug("Disabled");
         }
     }
 
@@ -175,30 +125,29 @@ public class Main extends JavaPlugin {
         return config;
     }
 
-    private void loadLibraries() {
+    private List<String> loadLibraries() {
         final List<Library> libraries = new ArrayList<>();
 
-        boolean oldVersion = getServer().getVersion().contains("1.8") || getServer().getVersion().contains("1.9")
-                || getServer().getVersion().contains("1.10") || getServer().getVersion().contains("1.11")
-                || getServer().getVersion().contains("1.12") || getServer().getVersion().contains("1.13")
-                || getServer().getVersion().contains("1.14") || getServer().getVersion().contains("1.15")
-                || getServer().getVersion().contains("1.16");
+        boolean oldVersion = version.isInRange(8, 16);
+
+        List<String> messagesToSend = new ArrayList<>();
 
         if (oldVersion) {
-            Bukkit.getConsoleSender().sendMessage("Loading legacy libraries...");
+            messagesToSend.add("Loading legacy libraries...");
             Reader targetReader = new InputStreamReader(getResource("plugin.yml"));
 
             YamlConfiguration pluginFile = YamlConfiguration.loadConfiguration(targetReader);
             for (final String libraryPath : pluginFile.getStringList("legacy-libraries")) {
                 final Library library = Library.fromMavenRepo(libraryPath);
-                Bukkit.getConsoleSender().sendMessage("Loading library " + libraryPath);
+                messagesToSend.add("Loading library " + libraryPath);
                 libraries.add(library);
             }
 
             for (final Library library : libraries)
-                library.load();
-            Bukkit.getConsoleSender().sendMessage("Legacy libraries loaded!");
+                library.load(Main.class.getClassLoader());
+            messagesToSend.add("Legacy libraries loaded!");
         }
+        return messagesToSend;
     }
 
 }

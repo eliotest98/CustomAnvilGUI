@@ -1,6 +1,6 @@
 package io.eliotesta98.CustomAnvilGUI.Database.Objects;
 
-import com.HeroxWar.HeroxCore.MessageGesture;
+import io.eliotesta98.CustomAnvilGUI.Core.Main;
 import io.eliotesta98.CustomAnvilGUI.Module.Vault.VaultUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -130,11 +130,11 @@ public class PaymentConfig {
             if (type.equalsIgnoreCase("Money")) {
                 if (vaultEnabled) {
                     if (!VaultUtils.pay(p, price)) {
-                        MessageGesture.sendMessage(p, notEnoughMoney);
+                        Main.messageGesturePaper.sendMessage(p, notEnoughMoney);
                         return false;
                     }
                 } else {
-                    MessageGesture.sendMessage(Bukkit.getServer().getConsoleSender(), "&c&lERROR WITH CONFIGURATION AT Configuration.BreakGesture.Payment.Type, IF YOU WANT THIS PAYMENT TYPE PLEASE ENABLE VAULT COMPATIBILITY!");
+                    Main.messageGesturePaper.sendMessage("&c&lERROR WITH CONFIGURATION AT Configuration.BreakGesture.Payment.Type, IF YOU WANT THIS PAYMENT TYPE PLEASE ENABLE VAULT COMPATIBILITY!");
                 }
             } else if (type.equalsIgnoreCase("Experience")) {
                 int levelPayment = (int) price;
@@ -142,7 +142,7 @@ public class PaymentConfig {
                 if (finalLevel >= 0) {
                     p.setLevel(finalLevel);
                 } else {
-                    MessageGesture.sendMessage(p, notEnoughExperience);
+                    Main.messageGesturePaper.sendMessage(p, notEnoughExperience);
                     return false;
                 }
             } else {
@@ -153,7 +153,7 @@ public class PaymentConfig {
                     itemStack = new ItemStack(realMaterial, (int) price, Short.parseShort(material[2]));
                 }
                 if (!p.getInventory().contains(itemStack.getType(), (int) price)) {
-                    MessageGesture.sendMessage(p, notEnoughMaterial);
+                    Main.messageGesturePaper.sendMessage(p, notEnoughMaterial);
                     return false;
                 } else {
                     int itemSlot = p.getInventory().first(itemStack.getType());
@@ -181,7 +181,8 @@ public class PaymentConfig {
                 return false;
             }
         } catch (ScriptException e) {
-            MessageGesture.sendMessage(p, "&cAn Internal Error Occurred with function for calculate the price of tp");
+            Main.messageGesturePaper.sendMessage("&cAn Internal Error Occurred with function for calculate the price of tp");
+            Main.messageGesturePaper.sendMessage(p, "&cAn Internal Error Occurred with function for calculate the price of tp");
             return false;
         }
         return true;

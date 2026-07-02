@@ -1,12 +1,10 @@
 package io.eliotesta98.CustomAnvilGUI.Interfaces;
 
-import com.HeroxWar.HeroxCore.MessageGesture;
 import com.HeroxWar.HeroxCore.SoundGesture.SoundType;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import io.eliotesta98.CustomAnvilGUI.Core.Main;
 import io.eliotesta98.CustomAnvilGUI.Database.Objects.PaymentConfig;
 import io.eliotesta98.CustomAnvilGUI.Events.PlayerWriteEvent;
-import io.eliotesta98.CustomAnvilGUI.Utils.DebugUtils;
 import io.eliotesta98.CustomAnvilGUI.Utils.ExpUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -44,7 +42,6 @@ public class GuiEvent implements Listener {
     private final String renameInfo = Main.instance.getConfigGestion().getMessages().get("Info.Rename");
     private final String guiInsufficientExp = Main.instance.getConfigGestion().getMessages().get("Results.NoItem");
     private final List<String> whitelistedPlayers = new ArrayList<>();
-    private final DebugUtils debugUtils = new DebugUtils();
     private static final int percentageDamage = Main.instance.getConfigGestion().getPercentageDamage();
     private static final SoundType soundType = Main.instance.getConfigGestion().getStageSound();
 
@@ -52,10 +49,7 @@ public class GuiEvent implements Listener {
     public void onAnvilInventoryOpen(InventoryOpenEvent event) {
         if (event.getInventory().getType().toString().equalsIgnoreCase("ANVIL")
                 && !whitelistedPlayers.contains(event.getPlayer().getName())) {
-            if (debugGui) {
-                debugUtils.addLine("Open Inventory");
-                debugUtils.debug("InventoryOpenEvent");
-            }
+            Main.messageGesturePaper.logDebug("OpenInventory", debugGui);
             boolean cancelled = Main.instance.getConfigGestion().getInterfaces().get("Anvil").openInterface((Player) event.getPlayer(), event.getView());
             event.setCancelled(cancelled);
         }
@@ -63,52 +57,28 @@ public class GuiEvent implements Listener {
 
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
-        DebugUtils debug = new DebugUtils();
-        long time = System.currentTimeMillis();
         if (event.getInventory().getHolder() instanceof CustomAnvilGUIHolder) {
-            if (debugGui) {
-                debug.addLine("Custom Anvil Closing");
-            }
+            Main.messageGesturePaper.logDebug("Custom Anvil Closing", debugGui);
             Main.instance.getConfigGestion().getInterfaces().get("Anvil")
                     .removeInventory(event.getPlayer().getName(), event.getInventory(), event.getPlayer().getLocation(), false);
         }
         if (event.getInventory().getType().toString().equalsIgnoreCase("ANVIL")) {
-            if (debugGui) {
-                debug.addLine("Removing from whitelist");
-            }
+            Main.messageGesturePaper.logDebug("Removing from whitelist", debugGui);
             whitelistedPlayers.remove(event.getPlayer().getName());
-        }
-        if (debugGui) {
-            debug.addLine("Gui execution time= " + (System.currentTimeMillis() - time));
-            debug.debug("InventoryCloseEvent");
         }
     }
 
     @EventHandler
     public void onPlayerQuitEvent(PlayerQuitEvent event) {
-        DebugUtils debug = new DebugUtils();
-        long time = System.currentTimeMillis();
-
         if (event.getPlayer().getOpenInventory().getTopInventory().getHolder() instanceof CustomAnvilGUIHolder) {
             Main.instance.getConfigGestion().getInterfaces().get("Anvil").removeInventory(event.getPlayer().getName(), event.getPlayer().getOpenInventory().getTopInventory(), event.getPlayer().getLocation(), true);
-        }
-        if (debugGui) {
-            debug.addLine("Gui execution time= " + (System.currentTimeMillis() - time));
-            debug.debug("PlayerQuitEvent");
         }
     }
 
     @EventHandler
     public void onPlayerKickEvent(PlayerKickEvent event) {
-        DebugUtils debug = new DebugUtils();
-        long time = System.currentTimeMillis();
-
         if (event.getPlayer().getOpenInventory().getTopInventory().getHolder() instanceof CustomAnvilGUIHolder) {
             Main.instance.getConfigGestion().getInterfaces().get("Anvil").removeInventory(event.getPlayer().getName(), event.getPlayer().getOpenInventory().getTopInventory(), event.getPlayer().getLocation(), true);
-        }
-        if (debugGui) {
-            debug.addLine("Gui execution time= " + (System.currentTimeMillis() - time));
-            debug.debug("PlayerKickEvent");
         }
     }
 
@@ -136,10 +106,7 @@ public class GuiEvent implements Listener {
         Inventory inv = event.getClickedInventory();
 
         if (inv == null) {
-            if (debugGui) {
-                debugUtils.addLine("Inventory is null");
-                debugUtils.debug("Click Gui");
-            }
+            Main.messageGesturePaper.logDebug("Inventory is null", debugGui);
             return;
         }
 
@@ -150,10 +117,7 @@ public class GuiEvent implements Listener {
             InventoryView inventoryView = Main.instance.getConfigGestion().getInterfaces().get("Anvil").getInventoryFromName(p.getName());
             if (inventoryView == null) {
                 event.setCancelled(true);
-                if (debugGui) {
-                    debugUtils.addLine("Inventory View is null");
-                    debugUtils.debug("Click Gui");
-                }
+                Main.messageGesturePaper.logDebug("Inventory View is null", debugGui);
                 return;
             }
             Inventory topInventory = getTopInventory(inventoryView);
@@ -162,10 +126,7 @@ public class GuiEvent implements Listener {
             ClickType clickType = event.getClick();
             if (anvilType != Material.ANVIL && anvilType != Material.DAMAGED_ANVIL && anvilType != Material.CHIPPED_ANVIL) {
                 p.closeInventory();
-                if (debugGui) {
-                    debugUtils.addLine("Anvil block not exist");
-                    debugUtils.debug("Click Gui");
-                }
+                Main.messageGesturePaper.logDebug("Anvil block not exist", debugGui);
                 return;
             }
 
@@ -252,7 +213,7 @@ public class GuiEvent implements Listener {
                             } else {
                                 playerWriteEvent.addPlayer(p.getName(), inv.getItem(customInterface.getImportantSlots().get("FirstItem")));
                                 p.closeInventory();
-                                MessageGesture.sendMessage(p, renameInfo);
+                                Main.messageGesturePaper.sendMessage(p, renameInfo);
                             }
                         }
                     }
@@ -263,14 +224,14 @@ public class GuiEvent implements Listener {
                     if (clickType == ClickType.LEFT) {
                         if (!p.hasPermission("cagui.fix.hand")) {
                             p.closeInventory();
-                            MessageGesture.sendMessage(p, insufficientPermission);
+                            Main.messageGesturePaper.sendMessage(p, insufficientPermission);
                             return;
                         }
                         ItemStack itemStack = p.getInventory().getItemInHand();
                         // check if is air
                         if (itemStack.getType() == Material.AIR) {
                             p.closeInventory();
-                            MessageGesture.sendMessage(p, noItemInHand);
+                            Main.messageGesturePaper.sendMessage(p, noItemInHand);
                         }
                         // check if is an item with durability
                         if (!(itemStack.getItemMeta() instanceof Damageable)) {
@@ -297,7 +258,7 @@ public class GuiEvent implements Listener {
                     else {
                         if (!p.hasPermission("cagui.fix.inventory")) {
                             p.closeInventory();
-                            MessageGesture.sendMessage(p, insufficientPermission);
+                            Main.messageGesturePaper.sendMessage(p, insufficientPermission);
                             return;
                         }
                         for (ItemStack itemStack : p.getInventory().getStorageContents()) {
@@ -324,17 +285,15 @@ public class GuiEvent implements Listener {
                         }
                     }
                 }
-                if (debugGui) {
-                    debugUtils.addLine("The item is not null");
-                    debugUtils.addLine("The item is equals configuration in config.yml");
-                    debugUtils.debug("Click Gui");
-                }
+                Main.messageGesturePaper.logDebug(
+                        "The item is not null\n" +
+                                "The item has equal configuration of config.yml",
+                        debugGui);
             } else if (event.getCurrentItem() != null) {
-                if (debugGui) {
-                    debugUtils.addLine("The item is not null");
-                    debugUtils.addLine("Activate Section:" + nameItemConfig);
-                    debugUtils.debug("Click Gui");
-                }
+                Main.messageGesturePaper.logDebug(
+                        "The item is not null\n" +
+                                "Activate Section:" + nameItemConfig,
+                        debugGui);
 
                 ItemStack firstItem = inv.getItem(customInterface.getImportantSlots().get("SecondItem"));
 
@@ -396,7 +355,7 @@ public class GuiEvent implements Listener {
                             damageAnvil(p, anvilLocation, inv);
                         }
                     } else {
-                        MessageGesture.sendMessage(p, insufficientExp);
+                        Main.messageGesturePaper.sendMessage(p, insufficientExp);
                     }
                 }
 
@@ -443,13 +402,12 @@ public class GuiEvent implements Listener {
                 renameText = event.getInventory().getRenameText();
             }
 
-            if (debugGui) {
-                debugUtils.addLine("Custom Anvil Gui");
-                debugUtils.addLine("Repair Cost: " + repairCost);
-                debugUtils.addLine("Item Result: " + event.getResult());
-                debugUtils.addLine("Rename: " + renameText);
-                debugUtils.debug("PrepareAnvilEvent");
-            }
+            Main.messageGesturePaper.logDebug(
+                    "Custom Anvil Gui\n" +
+                            "Repair Cost: " + repairCost +
+                            "Item Result: " + event.getResult() +
+                            "Rename: " + renameText,
+                    debugGui);
 
             if (repairCost > 0) {
                 if (event.getResult() != null && event.getResult().getType() != Material.AIR) {
@@ -484,21 +442,6 @@ public class GuiEvent implements Listener {
                 blockData = (Directional) anvilLocation.getBlock().getBlockData();
                 blockData.setFacing(blockFace);
                 anvilLocation.getBlock().setBlockData(blockData);
-//                try {
-//                    org.bukkit.block.data.Directional blockData = (org.bukkit.block.data.Directional) anvilLocation.getBlock().getBlockData();
-//                    BlockFace blockFace = blockData.getFacing();
-//                    anvilLocation.getBlock().setType(Material.CHIPPED_ANVIL);
-//                    blockData = (org.bukkit.block.data.Directional) anvilLocation.getBlock().getBlockData();
-//                    blockData.setFacing(blockFace);
-//                    anvilLocation.getBlock().setBlockData(blockData);
-//                } catch (NoClassDefFoundError error) {
-//                    org.bukkit.material.Directional blockData = (org.bukkit.material.Directional) anvilLocation.getBlock().getState().getData();
-//                    BlockFace blockFace = blockData.getFacing();
-//                    anvilLocation.getBlock().setType(Material.ANVIL);
-//                    blockData = (org.bukkit.material.Directional) anvilLocation.getBlock().getState().getData();
-//                    blockData.setFacingDirection(blockFace);
-//                    ((org.bukkit.material.Directional) anvilLocation.getBlock().getState().getData()).setFacingDirection(blockFace);
-//                }
                 soundType.playSound(anvilLocation);
             } else if (anvilType == Material.CHIPPED_ANVIL) {
                 Directional blockData = (Directional) anvilLocation.getBlock().getBlockData();
@@ -507,21 +450,6 @@ public class GuiEvent implements Listener {
                 blockData = (Directional) anvilLocation.getBlock().getBlockData();
                 blockData.setFacing(blockFace);
                 anvilLocation.getBlock().setBlockData(blockData);
-//                try {
-//                    org.bukkit.block.data.Directional blockData = (org.bukkit.block.data.Directional) anvilLocation.getBlock().getBlockData();
-//                    BlockFace blockFace = blockData.getFacing();
-//                    anvilLocation.getBlock().setType(Material.DAMAGED_ANVIL);
-//                    blockData = (org.bukkit.block.data.Directional) anvilLocation.getBlock().getBlockData();
-//                    blockData.setFacing(blockFace);
-//                    anvilLocation.getBlock().setBlockData(blockData);
-//                } catch (NoClassDefFoundError error) {
-//                    org.bukkit.material.Directional blockData = (org.bukkit.material.Directional) anvilLocation.getBlock().getState().getData();
-//                    BlockFace blockFace = blockData.getFacing();
-//                    anvilLocation.getBlock().setType(Material.DAMAGED_ANVIL);
-//                    blockData = (org.bukkit.material.Directional) anvilLocation.getBlock().getState().getData();
-//                    blockData.setFacingDirection(blockFace);
-//                    ((org.bukkit.material.Directional) anvilLocation.getBlock().getState().getData()).setFacingDirection(blockFace);
-//                }
                 soundType.playSound(anvilLocation);
             } else if (anvilType == Material.DAMAGED_ANVIL) {
                 anvilLocation.getBlock().setType(Material.AIR);

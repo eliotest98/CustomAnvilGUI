@@ -1,6 +1,5 @@
 package io.eliotesta98.CustomAnvilGUI.Events;
 
-import com.HeroxWar.HeroxCore.MessageGesture;
 import io.eliotesta98.CustomAnvilGUI.Core.Main;
 import io.eliotesta98.CustomAnvilGUI.Interfaces.GuiEvent;
 import io.eliotesta98.CustomAnvilGUI.Utils.ExpUtils;
@@ -65,11 +64,11 @@ public class PlayerWriteEvent implements Listener {
                         Bukkit.getScheduler().scheduleSyncDelayedTask(Main.instance, () -> GuiEvent.damageAnvil(player, anvilLocation, inv));
                         ExpUtils.changeExpLevels(player, -1);
                     } else {
-                        MessageGesture.sendMessage(player, insufficientExp);
+                        Main.messageGesturePaper.sendMessage(player, insufficientExp);
                     }
                     renamingPlayers.remove(player.getName());
                 } else {
-                    MessageGesture.sendMessage(player, successfullyRename);
+                    Main.messageGesturePaper.sendMessage(player, successfullyRename);
                 }
                 event.setCancelled(true);
             }

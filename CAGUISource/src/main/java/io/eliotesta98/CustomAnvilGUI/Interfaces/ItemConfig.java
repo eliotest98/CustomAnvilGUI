@@ -1,9 +1,9 @@
 package io.eliotesta98.CustomAnvilGUI.Interfaces;
 
-import com.HeroxWar.HeroxCore.MessageGesture;
 import com.HeroxWar.HeroxCore.Utils.Texture;
 import com.HeroxWar.HeroxCore.Utils.TextureException;
 import de.tr7zw.changeme.nbtapi.NBTItem;
+import io.eliotesta98.CustomAnvilGUI.Core.Main;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -50,7 +50,7 @@ public class ItemConfig {
         if (!lore.isEmpty()) {
             ArrayList<String> lorenew = new ArrayList<>();
             for (String lorePart : lore) {
-                lorenew.add(MessageGesture.transformColor(lorePart)
+                lorenew.add(Main.messageGesturePaper.applyColorLegacy(lorePart)
                         .replace("{priceHand}", nbtList[0].split(":")[1])
                         .replace("{priceInventory}", nbtList[1].split(":")[1])
                 );
@@ -79,7 +79,7 @@ public class ItemConfig {
             }
             newName = name.replace("{message}", message);
         }
-        itemm.setDisplayName(MessageGesture.transformColor(newName));
+        itemm.setDisplayName(Main.messageGesturePaper.applyColorLegacy(newName));
         item.setItemMeta(itemm);
         if (item.getType().toString().equalsIgnoreCase("AIR")) {
             return item;

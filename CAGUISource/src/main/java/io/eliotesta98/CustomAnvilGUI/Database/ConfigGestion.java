@@ -1,6 +1,6 @@
 package io.eliotesta98.CustomAnvilGUI.Database;
 
-import com.HeroxWar.HeroxCore.MessageGesture;
+import com.HeroxWar.HeroxCore.Gestion.DefaultGestion;
 import com.HeroxWar.HeroxCore.SoundGesture.SoundType;
 import io.eliotesta98.CustomAnvilGUI.Core.Main;
 import io.eliotesta98.CustomAnvilGUI.Database.Objects.PaymentConfig;
@@ -15,53 +15,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ConfigGestion {
+public class ConfigGestion extends DefaultGestion {
 
-    private final HashMap<String, Boolean> hooks = new HashMap<>();
-    private final HashMap<String, String> messages = new HashMap<>();
-    private final HashMap<String, Boolean> debug = new HashMap<>();
     private final HashMap<String, Interface> interfaces = new HashMap<>();
     private final SoundType stageSound;
     private final int percentageDamage;
     private final boolean directRename, onlyBedrock;
     private final PaymentConfig fixHandPayment, fixInventoryPayment;
 
-    public ConfigGestion(FileConfiguration file) {
+    private final FileConfiguration file;
 
-        String prefix = "";
-        for (String message : file.getConfigurationSection("Messages").getKeys(false)) {
-            if (message.equalsIgnoreCase("Commands")) {
-                for (String commands : file.getConfigurationSection("Messages.Commands").getKeys(false)) {
-                    messages.put(message + "." + commands, file.getString("Messages.Commands." + commands));
-                }
-            } else if (message.equalsIgnoreCase("Prefix")) {
-                prefix = file.getString("Messages." + message);
-                messages.put(message, prefix);
-            } else if (message.equalsIgnoreCase("Lists")) {
-                for (String success : file.getConfigurationSection("Messages.Lists").getKeys(false)) {
-                    messages.put(message + "." + success, file.getString("Messages.Lists." + success).replace("{prefix}", prefix));
-                }
-            } else if (message.equalsIgnoreCase("Warnings")
-                    || message.equalsIgnoreCase("Errors")
-                    || message.equalsIgnoreCase("Success")
-                    || message.equalsIgnoreCase("Info")
-                    || message.equalsIgnoreCase("Results")
-            ) {
-                for (String success : file.getConfigurationSection("Messages." + message).getKeys(false)) {
-                    messages.put(message + "." + success, file.getString("Messages." + message + "." + success).replace("{prefix}", prefix));
-                }
-            } else {
-                messages.put(message, file.getString("Messages." + message).replace("{prefix}", prefix));
-            }
-        }
-
-        for (String event : file.getConfigurationSection("Debug").getKeys(false)) {
-            debug.put(event, file.getBoolean("Debug." + event));
-        }
-
-        for (String hook : file.getConfigurationSection("Configuration.Hooks").getKeys(false)) {
-            hooks.put(hook, file.getBoolean("Configuration.Hooks." + hook));
-        }
+    public ConfigGestion(String path, String fileName, String... ignoredSections) {
+        super(path, fileName, Main.instance.getName(), ignoredSections);
+        file = this.getFileConfiguration();
+        this.defaultInformations();
 
         percentageDamage = file.getInt("Configuration.AnvilDamage.Damage", 12);
         directRename = file.getBoolean("Configuration.DirectRename");
@@ -72,10 +39,10 @@ public class ConfigGestion {
                 file.getDouble("Configuration.AnvilSound.Pitch")
         );
 
-        String messageNotEnoughMaterial = messages.get("Errors.NotEnoughMaterial");
-        String messageNotEnoughExperience = messages.get("Errors.NotEnoughExperience");
-        String messageNotEnoughMoney = messages.get("Errors.NotEnoughMoney");
-        boolean vaultEnable = hooks.get("Vault");
+        String messageNotEnoughMaterial = getMessages().get("Errors.NotEnoughMaterial");
+        String messageNotEnoughExperience = getMessages().get("Errors.NotEnoughExperience");
+        String messageNotEnoughMoney = getMessages().get("Errors.NotEnoughMoney");
+        boolean vaultEnable = getHooks().get("Vault");
 
         fixHandPayment = new PaymentConfig(
                 file.getBoolean("Configuration.FixItems.Hand.Payment.Enabled"),
@@ -123,12 +90,12 @@ public class ConfigGestion {
                     if (type.contains(";")) {
                         String[] x = type.split(";");
                         if (Material.getMaterial(x[0]) == null) {
-                            MessageGesture.sendMessage(Main.instance.getServer().getConsoleSender(), "&c&lERROR WITH MATERIAL " + x[0] + " IN CONFIG.YML AT LINE: Interfaces." + nameInterface + ".Items." + nameItem + ".Type");
+                            Main.messageGesturePaper.sendMessage("&c&lERROR WITH MATERIAL " + x[0] + " IN CONFIG.YML AT LINE: Interfaces." + nameInterface + ".Items." + nameItem + ".Type");
                             type = "DIRT";
                         }
                     } else {
                         if (Material.getMaterial(type) == null) {
-                            MessageGesture.sendMessage(Main.instance.getServer().getConsoleSender(), "&c&lERROR WITH MATERIAL " + type + " IN CONFIG.YML AT LINE: Interfaces." + nameInterface + ".Items." + nameItem + ".Type");
+                            Main.messageGesturePaper.sendMessage("&c&lERROR WITH MATERIAL " + type + " IN CONFIG.YML AT LINE: Interfaces." + nameInterface + ".Items." + nameItem + ".Type");
                             type = "DIRT";
                         }
                     }
@@ -151,23 +118,11 @@ public class ConfigGestion {
                     slots.add("" + value.charAt(i));
                 }
             });
-            Interface customInterface = new Interface(title, openSound, slots, itemsConfig, inputs, debug.get("ClickGui"),
+            Interface customInterface = new Interface(title, openSound, slots, itemsConfig, inputs, getDebug().get("ClickGui"),
                     contaSlots.size(), nameInterface, "", "");
-            customInterface.initialize(messages.get("Success.Rename"), directRename, messages.get("Errors.InsufficientExperience"));
+            customInterface.initialize(getMessages().get("Success.Rename"), directRename, getMessages().get("Errors.InsufficientExperience"));
             interfaces.put(nameInterface, customInterface);
         }
-    }
-
-    public HashMap<String, Boolean> getHooks() {
-        return hooks;
-    }
-
-    public HashMap<String, String> getMessages() {
-        return messages;
-    }
-
-    public HashMap<String, Boolean> getDebug() {
-        return debug;
     }
 
     public HashMap<String, Interface> getInterfaces() {
@@ -201,9 +156,14 @@ public class ConfigGestion {
     @Override
     public String toString() {
         return "ConfigGestion{" +
-                "hooks=" + hooks +
-                ", messages=" + messages +
-                ", debug=" + debug +
+                "interfaces=" + interfaces +
+                ", stageSound=" + stageSound +
+                ", percentageDamage=" + percentageDamage +
+                ", directRename=" + directRename +
+                ", onlyBedrock=" + onlyBedrock +
+                ", fixHandPayment=" + fixHandPayment +
+                ", fixInventoryPayment=" + fixInventoryPayment +
+                ", file=" + file +
                 '}';
     }
 }
