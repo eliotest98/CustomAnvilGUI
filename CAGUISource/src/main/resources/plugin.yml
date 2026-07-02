@@ -5,6 +5,19 @@ api-version: 1.13
 authors: [eliotesta98, xSavior_of_God]
 softdepend: [Floodgate, Vault]
 depend: []
+
+libraries:
+  - org.json:json:20250517
+  - net.kyori:adventure-api:4.19.0
+  - net.kyori:adventure-text-minimessage:4.25.0
+  - net.kyori:adventure-platform-bukkit:4.4.1
+
+legacy-libraries:
+  - org.json:json:20250517
+  - net.kyori:adventure-api:4.19.0
+  - net.kyori:adventure-text-minimessage:4.25.0
+  - net.kyori:adventure-platform-bukkit:4.4.1
+
 commands:
   customanvilgui:
     aliases: [cagui]

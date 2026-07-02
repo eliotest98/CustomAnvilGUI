@@ -1,6 +1,5 @@
 package io.eliotesta98.CustomAnvilGUI.Interfaces;
 
-import com.HeroxWar.HeroxCore.MessageGesture;
 import com.HeroxWar.HeroxCore.SoundGesture.SoundType;
 import io.eliotesta98.CustomAnvilGUI.Core.Main;
 import io.eliotesta98.CustomAnvilGUI.Events.PlayerWriteEvent;
@@ -34,7 +33,7 @@ public class Interface {
     private boolean directRename;
 
     public Interface(String title, SoundType soundOpen, ArrayList<String> slots, HashMap<String, ItemConfig> itemsConfig, List<FloodgateInput> floodgateInputs, boolean debug, int sizeModifiableSlot, String nameInterface, String nameInterfaceToOpen, String nameInterfaceToReturn) {
-        this.title = MessageGesture.transformColor(title);
+        this.title = Main.messageGesturePaper.applyColorLegacy(title);
         this.soundOpen = soundOpen;
         this.itemsConfig.putAll(itemsConfig);
         this.debug = debug;
@@ -226,12 +225,12 @@ public class Interface {
                             Bukkit.getScheduler().scheduleSyncDelayedTask(Main.instance, () -> GuiEvent.damageAnvil(player, event.getAnvilLocation(), event.getInv()));
                             ExpUtils.changeExpLevels(player, -1);
                         } else {
-                            MessageGesture.sendMessage(player, insufficientExp);
+                            Main.messageGesturePaper.sendMessage(player, insufficientExp);
                         }
                         event.removePlayer(player.getName());
                     } else {
                         event.addPlayer(player.getName(), event.getItemInHand(player.getName()), event.createItemStack(response.asInput(0)));
-                        MessageGesture.sendMessage(player, successRename);
+                        Main.messageGesturePaper.sendMessage(player, successRename);
                     }
                 })
                 .closedResultHandler(() -> event.removePlayer(player.getName()))
