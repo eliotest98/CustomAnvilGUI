@@ -5,6 +5,7 @@ import de.tr7zw.changeme.nbtapi.NBTItem;
 import io.eliotesta98.CustomAnvilGUI.Core.Main;
 import io.eliotesta98.CustomAnvilGUI.Database.Objects.PaymentConfig;
 import io.eliotesta98.CustomAnvilGUI.Events.PlayerWriteEvent;
+import io.eliotesta98.CustomAnvilGUI.Module.ExcellentEnchants.ExcellentEnchantsUtils;
 import io.eliotesta98.CustomAnvilGUI.Utils.ExpUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -23,6 +24,7 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.Repairable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -383,7 +385,9 @@ public class GuiEvent implements Listener {
         }
     }
 
-    @EventHandler
+    // ExcellentEnchants use EventPriotiry.HIGH
+    // For this reason I have to use EventPriority.MONITOR
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onInventoryPrepareAnvilEvent(PrepareAnvilEvent event) {
         Player player = (Player) getInventoryInfo(event, "getPlayer");
         Inventory topInventory = getTopInventory(player.getOpenInventory());
@@ -404,10 +408,15 @@ public class GuiEvent implements Listener {
 
             Main.messageGesturePaper.logDebug(
                     "Custom Anvil Gui\n" +
-                            "Repair Cost: " + repairCost +
-                            "Item Result: " + event.getResult() +
+                            "Repair Cost: " + repairCost + "\n" +
+                            "Item Result: " + event.getResult() + "\n" +
                             "Rename: " + renameText,
                     debugGui);
+
+            int possibleRepairCost = ExcellentEnchantsUtils.getRepairCost(event.getResult());
+            if (possibleRepairCost > 0) {
+                repairCost = possibleRepairCost;
+            }
 
             if (repairCost > 0) {
                 if (event.getResult() != null && event.getResult().getType() != Material.AIR) {

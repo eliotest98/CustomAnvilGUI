@@ -9,6 +9,8 @@ Configuration:
   Hooks:
     Floodgate: false
     Vault: false
+    # If you use the Charge Mechanism of ExcellentEnchants enable this!
+    ExcellentEnchants: false
 
   # If you want only bedrock players open the custom anvil gui
   # P.S. For check this you have to activate the hook of Floodgate!

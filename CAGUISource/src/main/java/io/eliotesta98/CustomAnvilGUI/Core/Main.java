@@ -10,11 +10,13 @@ import io.eliotesta98.CustomAnvilGUI.Commands.TabCommands;
 import io.eliotesta98.CustomAnvilGUI.Database.ConfigGestion;
 import io.eliotesta98.CustomAnvilGUI.Interfaces.GuiEvent;
 import io.eliotesta98.CustomAnvilGUI.Interfaces.Interface;
+import io.eliotesta98.CustomAnvilGUI.Module.ExcellentEnchants.ExcellentEnchantsUtils;
 import io.eliotesta98.CustomAnvilGUI.Module.Floodgate.FloodgateUtils;
 import io.eliotesta98.CustomAnvilGUI.Module.Vault.VaultUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +46,7 @@ public class Main extends JavaPlugin {
 
         messageGesturePaper = new MessageGesturePaper(true, false, instance);
 
-        for(String message: libraryLegacyMessages) {
+        for (String message : libraryLegacyMessages) {
             messageGesturePaper.sendMessage(message);
         }
         libraryLegacyMessages.clear();
@@ -90,6 +92,8 @@ public class Main extends JavaPlugin {
                 } catch (Exception e) {
                     messageGesturePaper.sendMessage("&cSomething went wrong while adding compatibility to &eFloodgate&c! &f" + e.getMessage());
                 }
+            } else {
+                getConfigGestion().getHooks().replace("Floodgate", false);
             }
             /*if (getConfigGestion().getHooks().get("AdvancedEnchantments")) {
                 if (Bukkit.getPluginManager().isPluginEnabled("AdvancedEnchantments")) {
@@ -106,6 +110,14 @@ public class Main extends JavaPlugin {
                 }
             } else {
                 getConfigGestion().getHooks().replace("Vault", false);
+            }
+            if (getServer().getPluginManager().isPluginEnabled("ExcellentEnchants")) {
+                if (getConfigGestion().getHooks().get("ExcellentEnchants")) {
+                    ExcellentEnchantsUtils.setExcellentEnchants(true);
+                    messageGesturePaper.sendMessage("&7Added compatibility with ExcellentEnchants.");
+                }
+            } else {
+                getConfigGestion().getHooks().replace("ExcellentEnchants", false);
             }
         });
 
