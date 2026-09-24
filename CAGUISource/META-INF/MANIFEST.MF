@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+Automatic-Module-Name: org.mockbukkit.mockbukkit
+Paper-Version: 1.21.11-R0.1-SNAPSHOT
+Paper-API-Version: 1.21
+MockBukkit-Version: 4.110.0
+

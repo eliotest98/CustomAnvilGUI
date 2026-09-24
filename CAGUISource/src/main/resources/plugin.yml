@@ -3,14 +3,15 @@ version: maven-version-number
 main: io.eliotesta98.CustomAnvilGUI.Core.Main
 api-version: 1.13
 authors: [eliotesta98, xSavior_of_God]
-softdepend: [Floodgate, Vault]
+softdepend: [Floodgate, Vault, Essentials]
 depend: []
 
 libraries:
   - org.json:json:20250517
-  - net.kyori:adventure-api:4.19.0
-  - net.kyori:adventure-text-minimessage:4.25.0
-  - net.kyori:adventure-platform-bukkit:4.4.1
+  - net.kyori:adventure-api:5.2.0
+  - net.kyori:adventure-text-minimessage:5.2.0
+  # if you are on version 26.1 or lower and you want use adventure platform, comment out the next line
+  # - net.kyori:adventure-platform-bukkit:4.4.1
 
 legacy-libraries:
   - org.json:json:20250517
@@ -21,6 +22,7 @@ legacy-libraries:
 commands:
   customanvilgui:
     aliases: [cagui]
+
 permissions:
   cagui.command.help:
     description: /cagui <help>
@@ -39,4 +41,7 @@ permissions:
     default: op
   cagui.fix.inventory.bypass:
     description: for bypass the costs of fix inventory
+    default: op
+  cagui.command.anvil:
+    description: /anvil [original] command
     default: op
