@@ -11,24 +11,47 @@ Configuration:
     Vault: false
     # If you use the Charge Mechanism of ExcellentEnchants enable this!
     ExcellentEnchants: false
+    # If you want a correctly work from CustomAnvilGUI and Essentials for the /anvil command
+    # you have to enable Essentials hook!
+    # P.S. If you enable this you have to enable the VirtualAnvil (the plugin automatically enable it)!
+    Essentials: false
+
 
   # If you want only bedrock players open the custom anvil gui
   # P.S. For check this you have to activate the hook of Floodgate!
   OnlyBedrock: false
+
 
   # This section is for configuring how much is the possibility of anvil damage at every use.
   # For default, there is 1/8 (12%) possibility to damage the anvil at each use
   AnvilDamage:
     Damage: 12
 
+
   # Configure if you want directly the rename of item or reopen the anvil for rename an item
   DirectRename: false
+
+
+  # This section enable the command for open a virtual anvil in any place
+  # If you enable this, you can use the command /anvil [original] to open a virtual anvil
+  # P.S. This works only from a certain version (1.17+)!
+  # Confirmed tested versions: 1.21.10, 1.20.6, 26.x
+  VirtualAnvil:
+    Enabled: false
+    Alias:
+      - 'anvil'
+      - 'anv'
+    # Command to execute for open an anvil for particular conditions
+    # For example when you click on Back button in the anvil interface or when Essentials execute the /anvil command
+    CommandAnvil: '/anvil'
+
 
   # This sound is triggered when an anvil change stage
   AnvilSound:
     SoundName: 'minecraft:block.anvil.use'
     Volume: 100
     Pitch: 0.6
+
 
   FixItems:
     Hand:
@@ -55,6 +78,7 @@ Configuration:
         Type: "Money"
         # Formula for calculate the final price (PS: You can use only this operation: + - * / and only one type of operation!)
         Calculation: "{price} * {durability}"
+
 
 Interface:
   Anvil:
@@ -152,10 +176,11 @@ Interface:
 # you can use a different coloring by using a hexadecimal. for all messages Ex. &{#FFFF00}(yellow).
 # Example for a command: '/cagui &{#FFFF00}<reload>&{#000000} command reload Labyrinth plugin'
 Messages:
-  Prefix: '&eCustomAnvilGUI &r'
+  Prefix: '&eCustomAnvilGUI&r '
   Commands:
     Footer: '&7(&7&l(&c&l!&7&l)&7) &9[] optional value, <> required'
-    Reload: '   &e/cagui &6<reload> &7for reload CustomAnvilGUI'
+    Reload: '   &e/cagui &6<reload> [soft] &7for reload CustomAnvilGUI or reload only configurations'
+    Anvil: '   &e/<anvil> &6[original] &7for open custom anvil or the original'
     Help: '   &e/cagui &6<help> &7for help commands'
   Success:
     Rename: '{prefix}&aTool name has been successfully registered, please now reopen the anvil, place your tool in the anvil and click on Rename button'

@@ -33,7 +33,7 @@ public class Interface {
     private boolean directRename;
 
     public Interface(String title, SoundType soundOpen, ArrayList<String> slots, HashMap<String, ItemConfig> itemsConfig, List<FloodgateInput> floodgateInputs, boolean debug, int sizeModifiableSlot, String nameInterface, String nameInterfaceToOpen, String nameInterfaceToReturn) {
-        this.title = Main.messageGesturePaper.applyColorLegacy(title);
+        this.title = title;
         this.soundOpen = soundOpen;
         this.itemsConfig.putAll(itemsConfig);
         this.debug = debug;
@@ -199,7 +199,7 @@ public class Interface {
     }
 
     private CustomForm.Builder createCustomForm(Player player, PlayerWriteEvent event) {
-        CustomForm.Builder customForm = CustomForm.builder().title(title);
+        CustomForm.Builder customForm = CustomForm.builder().title(Main.messageGesturePaper.applyColorLegacy(title, player));
         for (FloodgateInput floodgateInput : floodgateInputs) {
             switch (floodgateInput.getType()) {
                 case "Input":
@@ -238,13 +238,13 @@ public class Interface {
         return customForm;
     }
 
-    public void setCostOfEnchant(Inventory inventory, int levels) {
+    public void setCostOfEnchant(Inventory inventory, int levels, Player player) {
         int slotToChange = importantSlots.get("Cost");
-        inventory.setItem(slotToChange, this.getItemsConfig().get(importantSlotsLetter.get("Cost")).createItemConfig(this.getNameInterface(), "ap.experience:" + levels, slotToChange));
+        inventory.setItem(slotToChange, this.getItemsConfig().get(importantSlotsLetter.get("Cost")).createItemConfig(this.getNameInterface(), "ap.experience:" + levels, slotToChange, player));
     }
 
-    public void setBorder(Inventory inventory, int slot) {
-        inventory.setItem(slot, this.itemsConfig.get(importantSlotsLetter.get("Border")).createItemConfig(this.getNameInterface(), "", slot));
+    public void setBorder(Inventory inventory, int slot, Player player) {
+        inventory.setItem(slot, this.itemsConfig.get(importantSlotsLetter.get("Border")).createItemConfig(this.getNameInterface(), "", slot, player));
     }
 
     public void deleteItemsWhenResult(Inventory inventory, Player player) {
@@ -265,15 +265,15 @@ public class Interface {
         inventory.setItem(slotToChange, null);
     }
 
-    public void deleteResult(Inventory inventory) {
+    public void deleteResult(Inventory inventory, Player player) {
         int slotCost = importantSlots.get("Cost");
-        setBorder(inventory, slotCost);
-        setBarrier(inventory, " ");
+        setBorder(inventory, slotCost, player);
+        setBarrier(inventory, " ", player);
     }
 
-    public void setBarrier(Inventory inventory, String reason) {
+    public void setBarrier(Inventory inventory, String reason, Player player) {
         int slotResult = importantSlots.get("NoResult");
-        inventory.setItem(slotResult, getItemsConfig().get(importantSlotsLetter.get("NoResult")).createItemConfig(getNameInterface(), "ap.message:" + reason, slotResult));
+        inventory.setItem(slotResult, getItemsConfig().get(importantSlotsLetter.get("NoResult")).createItemConfig(getNameInterface(), "ap.message:" + reason, slotResult, player));
     }
 
     public void setRename(Inventory inventory, Player player, PlayerWriteEvent event, ItemStack itemToRename) {
@@ -303,36 +303,36 @@ public class Interface {
                 } else if (itemsConfig.get(slot).getNameItemConfig().equalsIgnoreCase("NoResult")) {
                     importantSlots.putIfAbsent(itemsConfig.get(slot).getNameItemConfig(), i);
                     importantSlotsLetter.putIfAbsent(itemsConfig.get(slot).getNameItemConfig(), slot);
-                    inventory.setItem(i, getItemsConfig().get(slot).createItemConfig(getNameInterface(), "ap.message: ", i));
+                    inventory.setItem(i, getItemsConfig().get(slot).createItemConfig(getNameInterface(), "ap.message: ", i, player));
                 } else if (itemsConfig.get(slot).getNameItemConfig().equalsIgnoreCase("Fix")) {
                     inventory.setItem(i,
                             getItemsConfig().get(slot).createItemConfig(getNameInterface(),
                                     "ap.priceHand:" + Main.instance.getConfigGestion().getFixHandPayment().calculatePrice(player, true) +
-                                            ";ap.priceInventory:" + Main.instance.getConfigGestion().getFixHandPayment().calculatePrice(player, false), i));
+                                            ";ap.priceInventory:" + Main.instance.getConfigGestion().getFixHandPayment().calculatePrice(player, false), i, player));
                 } else if (itemsConfig.get(slot).getNameItemConfig().equalsIgnoreCase("Cost")) {
                     importantSlots.putIfAbsent(itemsConfig.get(slot).getNameItemConfig(), i);
                     importantSlotsLetter.putIfAbsent(itemsConfig.get(slot).getNameItemConfig(), slot);
                     for (Map.Entry<String, ItemConfig> itemConfig : itemsConfig.entrySet()) {
                         if (itemConfig.getValue().getNameItemConfig().equalsIgnoreCase("Border")) {
-                            inventory.setItem(i, itemConfig.getValue().createItemConfig(getNameInterface(), "", i));
+                            inventory.setItem(i, itemConfig.getValue().createItemConfig(getNameInterface(), "", i, player));
                             break;
                         }
                     }
                 } else if (itemsConfig.get(slot).getNameItemConfig().equalsIgnoreCase("Back")) {
                     if (!Main.floodgateUtils.isBedrockPlayer(player.getUniqueId())) {
                         importantSlotsLetter.putIfAbsent(itemsConfig.get(slot).getNameItemConfig(), slot);
-                        inventory.setItem(i, getItemsConfig().get(slot).createItemConfig(getNameInterface(), "", i));
+                        inventory.setItem(i, getItemsConfig().get(slot).createItemConfig(getNameInterface(), "", i, player));
                     } else {
                         for (Map.Entry<String, ItemConfig> itemConfig : itemsConfig.entrySet()) {
                             if (itemConfig.getValue().getNameItemConfig().equalsIgnoreCase("Border")) {
-                                inventory.setItem(i, itemConfig.getValue().createItemConfig(getNameInterface(), "", i));
+                                inventory.setItem(i, itemConfig.getValue().createItemConfig(getNameInterface(), "", i, player));
                                 break;
                             }
                         }
                     }
                 } else {
                     importantSlotsLetter.putIfAbsent(itemsConfig.get(slot).getNameItemConfig(), slot);
-                    inventory.setItem(i, getItemsConfig().get(slot).createItemConfig(getNameInterface(), "", i));
+                    inventory.setItem(i, getItemsConfig().get(slot).createItemConfig(getNameInterface(), "", i, player));
                 }
             }
         });

@@ -2,6 +2,7 @@ package io.eliotesta98.CustomAnvilGUI.Commands;
 
 import com.HeroxWar.HeroxCore.ReloadGesture;
 import io.eliotesta98.CustomAnvilGUI.Core.Main;
+import io.eliotesta98.CustomAnvilGUI.Database.ConfigGestion;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -39,11 +40,25 @@ public class Commands implements CommandExecutor {
                         Main.messageGesturePaper.sendMessage(sender, errorInsufficientPermission);
                         return;
                     }
-                    Bukkit.getScheduler().scheduleSyncDelayedTask(Main.instance, () -> {
-                        Main.messageGesturePaper.sendMessage(sender, "&6Reloading...");
-                        ReloadGesture.reload(Main.instance.getName());
-                        Main.messageGesturePaper.sendMessage(sender, "&aReloaded!");
-                    });
+                    if (args.length == 1) {
+                        Bukkit.getScheduler().scheduleSyncDelayedTask(Main.instance, () -> {
+                            Main.messageGesturePaper.sendMessage(sender, "&6Reloading...");
+                            ReloadGesture.reload(Main.instance.getName());
+                            Main.messageGesturePaper.sendMessage(sender, "&aReloaded!");
+                        });
+                    } else {
+                        Main.messageGesturePaper.sendMessage(sender, "&6CustomAnvilGUI unload operation...");
+                        Main.instance.unload();
+                        Main.messageGesturePaper.sendMessage(sender, "&aCustomAnvilGUI unload operation completed!");
+
+                        Main.messageGesturePaper.sendMessage(sender, "&6Loading config...");
+                        Main.instance.setConfigGestion(new ConfigGestion(
+                                Main.instance.getDataFolder().getPath(), "config.yml",
+                                "Configuration.Auto_selling.Timer",
+                                "Configuration.Prices"));
+                        Main.instance.loadConfigs();
+                        Main.messageGesturePaper.sendMessage(sender, "&aConfiguration Reloaded!");
+                    }
                     break;
                 default:
                     String finale = "&e&lCustomAnvilGUI &7● Version " + Main.instance.getDescription().getVersion()

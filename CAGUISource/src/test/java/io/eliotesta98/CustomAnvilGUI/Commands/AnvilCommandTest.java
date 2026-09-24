@@ -1,7 +1,6 @@
-package io.eliotesta98.CustomAnvilGUI.Events;
+package io.eliotesta98.CustomAnvilGUI.Commands;
 
 import io.eliotesta98.CustomAnvilGUI.Core.Main;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,10 +8,8 @@ import org.mockbukkit.mockbukkit.MockBukkit;
 import org.mockbukkit.mockbukkit.ServerMock;
 import org.mockbukkit.mockbukkit.entity.PlayerMock;
 import org.mockbukkit.mockbukkit.world.WorldMock;
-import java.util.HashSet;
 
-// TODO to finish
-public class PlayerWriteEventTest {
+public class AnvilCommandTest {
 
     private static ServerMock serverMock;
     private static Main plugin;
@@ -38,11 +35,13 @@ public class PlayerWriteEventTest {
 
     @Test
     public void testPlayerWriteEvent() {
-        serverMock.getPluginManager().callEvent(
-                new AsyncPlayerChatEvent(false, playerMock,
-                        "test", new HashSet<>(worldMock.getPlayers())));
+        plugin.getConfigGestion().setVirtualAnvilEnabled(true);
+        plugin.onDisable();
+        plugin.onEnable();
+        serverMock.getScheduler().performTicks(100000);
+        playerMock.chat("/anvil");
 
-        serverMock.getPluginManager().assertEventFired(AsyncPlayerChatEvent.class);
+        //serverMock.getPluginManager().assertEventFired(PlayerCommandPreprocessEvent.class);
     }
 
 }

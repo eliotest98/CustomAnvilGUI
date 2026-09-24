@@ -1,10 +1,10 @@
 package io.eliotesta98.CustomAnvilGUI.Core;
 
+import com.HeroxWar.HeroxCore.MainCommons;
 import com.HeroxWar.HeroxCore.MessageGesture.MessageGesturePaper;
-import com.HeroxWar.HeroxCore.Utils.Library;
-import com.HeroxWar.HeroxCore.Utils.Metrics;
 import com.HeroxWar.HeroxCore.Utils.UpdateChecker;
 import com.HeroxWar.HeroxCore.Utils.Version;
+import io.eliotesta98.CustomAnvilGUI.Commands.AnvilCommand;
 import io.eliotesta98.CustomAnvilGUI.Commands.Commands;
 import io.eliotesta98.CustomAnvilGUI.Commands.TabCommands;
 import io.eliotesta98.CustomAnvilGUI.Database.ConfigGestion;
@@ -14,67 +14,56 @@ import io.eliotesta98.CustomAnvilGUI.Module.ExcellentEnchants.ExcellentEnchantsU
 import io.eliotesta98.CustomAnvilGUI.Module.Floodgate.FloodgateUtils;
 import io.eliotesta98.CustomAnvilGUI.Module.Vault.VaultUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.plugin.java.JavaPlugin;
-
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
-public class Main extends JavaPlugin {
+public class Main extends MainCommons {
 
     public static Main instance;
     public static FloodgateUtils floodgateUtils;
     private ConfigGestion config;
     public static MessageGesturePaper messageGesturePaper;
-    private List<String> libraryLegacyMessages = new ArrayList<>();
     public static Version version;
+
+    private AnvilCommand anvilCommand;
 
     @Override
     public void onLoad() {
         instance = this;
+        onLoadInit(this);
         floodgateUtils = new FloodgateUtils();
-        version = new Version();
-        // Load libraries where Spigot does not do this automatically
-        libraryLegacyMessages = loadLibraries();
     }
 
     public void onEnable() {
-        int pluginId = 25649;
-        new Metrics(this, pluginId);
+        onEnableInit(this, "\r\n \r\n \r\n &a #####      #      #####   #     #  ### \n" +
+                "&a #     #    # #    #     #  #     #   #  \n" +
+                "&a #         #   #   #        #     #   #  \n" +
+                "&a #        #     #  #  ####  #     #   #  \n" +
+                "&a #        #######  #     #  #     #   #  \n" +
+                "&a #     #  #     #  #     #  #     #   #  \n" +
+                "&a  #####   #     #   #####    #####   ### " +
+                "                                   \n\n", 25649);
 
-        messageGesturePaper = new MessageGesturePaper(true, false, instance);
+        messageGesturePaper = getMessageGesturePaper();
+        version = getVersion();
 
-        for (String message : libraryLegacyMessages) {
-            messageGesturePaper.sendMessage(message);
-        }
-        libraryLegacyMessages.clear();
+        loadConfigs();
+    }
 
-        messageGesturePaper
-                .sendMessage("\r\n \r\n \r\n &a #####      #      #####   #     #  ### \n" +
-                        "&a #     #    # #    #     #  #     #   #  \n" +
-                        "&a #         #   #   #        #     #   #  \n" +
-                        "&a #        #     #  #  ####  #     #   #  \n" +
-                        "&a #        #######  #     #  #     #   #  \n" +
-                        "&a #     #  #     #  #     #  #     #   #  \n" +
-                        "&a  #####   #     #   #####    #####   ### " +
-                        "                                   \n\n"
-                        + "&e  Version " + getDescription().getVersion() + " \r\n"
-                        + "&e© Developed by &feliotesta98 & xSavior_of_God &ewith &4<3 \r\n \r\n");
+    public void onDisable() {
+        messageGesturePaper.sendMessage("&aCustomAnvilGUI has been disabled, &cBye bye! §e:(");
+        unload();
+    }
 
-        if (version.isInRange(8, 12)) {
-            messageGesturePaper.sendMessage("&6Server version registered < 1.13");
-        } else {
-            messageGesturePaper.sendMessage("&6Server version registered > 1.12");
-        }
-        messageGesturePaper.sendMessage("Version Detected: &c" + version.getFormattedServerVersion());
-
+    public void loadConfigs() {
         messageGesturePaper.sendMessage("&6Loading config...");
 
         config = new ConfigGestion(this.getDataFolder().getPath(), "config.yml",
                 "Configuration.Auto_selling.Timer",
                 "Configuration.Prices");
+
+        messageGesturePaper.setPrefix(config.getMessages().get("Prefix").trim());
+
         messageGesturePaper.sendMessage("&aConfiguration Loaded!");
 
         new UpdateChecker(instance, 116411).getVersion(version1 -> {
@@ -85,7 +74,7 @@ public class Main extends JavaPlugin {
 
         // RUNNABLE PER CARICARE LE DIPENDENZE ALLA FINE DELL'AVVIO DEL SERVER :D
         getServer().getScheduler().scheduleSyncDelayedTask(this, () -> {
-            if (getConfigGestion().getHooks().get("Floodgate")) {
+            if (config.getHooks().get("Floodgate")) {
                 try {
                     floodgateUtils.initialize();
                     messageGesturePaper.sendMessage("&7Added compatibility with Floodgate.");
@@ -93,43 +82,63 @@ public class Main extends JavaPlugin {
                     messageGesturePaper.sendMessage("&cSomething went wrong while adding compatibility to &eFloodgate&c! &f" + e.getMessage());
                 }
             } else {
-                getConfigGestion().getHooks().replace("Floodgate", false);
+                config.getHooks().replace("Floodgate", false);
             }
-            /*if (getConfigGestion().getHooks().get("AdvancedEnchantments")) {
+            /*if (config.getHooks().get("AdvancedEnchantments")) {
                 if (Bukkit.getPluginManager().isPluginEnabled("AdvancedEnchantments")) {
                     MessageGesture.sendMessage(Main.instance.getServer().getConsoleSender(), "&fAdvancedEnchantments&a hooked!");
                 } else {
-                    getConfigGestion().getHooks().replace("AdvancedEnchantments", false);
+                    config.getHooks().replace("AdvancedEnchantments", false);
                 }
             }*/
             if (getServer().getPluginManager().isPluginEnabled("Vault")) {
-                if (getConfigGestion().getHooks().get("Vault")) {
+                if (config.getHooks().get("Vault")) {
                     if (VaultUtils.setupEconomy()) {
                         messageGesturePaper.sendMessage("&7Added compatibility with Vault.");
                     }
                 }
             } else {
-                getConfigGestion().getHooks().replace("Vault", false);
+                config.getHooks().replace("Vault", false);
             }
             if (getServer().getPluginManager().isPluginEnabled("ExcellentEnchants")) {
-                if (getConfigGestion().getHooks().get("ExcellentEnchants")) {
+                if (config.getHooks().get("ExcellentEnchants")) {
                     ExcellentEnchantsUtils.setExcellentEnchants(true);
                     messageGesturePaper.sendMessage("&7Added compatibility with ExcellentEnchants.");
                 }
             } else {
-                getConfigGestion().getHooks().replace("ExcellentEnchants", false);
+                config.getHooks().replace("ExcellentEnchants", false);
+            }
+            if(getServer().getPluginManager().isPluginEnabled("Essentials")) {
+                if (config.getHooks().get("Essentials")) {
+                    messageGesturePaper.sendMessage("&7Added compatibility with Essentials.");
+                }
+            } else {
+                config.getHooks().replace("Essentials", false);
             }
         });
 
-        Bukkit.getServer().getPluginManager().registerEvents(new GuiEvent(), this);
+        if(getServer().getPluginManager().isPluginEnabled("Essentials")) {
+            if (config.getHooks().get("Essentials")) {
+                config.setVirtualAnvilEnabled(true);
+            }
+        }
+
+        GuiEvent guiEvent = new GuiEvent();
+        Bukkit.getServer().getPluginManager().registerEvents(guiEvent, this);
+        if (config.isVirtualAnvilEnabled()) {
+            anvilCommand = new AnvilCommand(guiEvent);
+            Bukkit.getServer().getPluginManager().registerEvents(anvilCommand, this);
+        }
         getCommand("customanvilgui").setExecutor(new Commands());
         getCommand("customanvilgui").setTabCompleter(new TabCommands());
     }
 
-    public void onDisable() {
-        messageGesturePaper.sendMessage("&aCustomAnvilGUI has been disabled, &cBye bye! §e:(");
-        for (Map.Entry<String, Interface> inventory : Main.instance.getConfigGestion().getInterfaces().entrySet()) {
+    public void unload() {
+        for (Map.Entry<String, Interface> inventory : config.getInterfaces().entrySet()) {
             inventory.getValue().closeAllInventories();
+        }
+        if (config.isVirtualAnvilEnabled() && anvilCommand != null) {
+            anvilCommand.disableEvent();
         }
     }
 
@@ -137,29 +146,8 @@ public class Main extends JavaPlugin {
         return config;
     }
 
-    private List<String> loadLibraries() {
-        final List<Library> libraries = new ArrayList<>();
-
-        boolean oldVersion = version.isInRange(8, 16);
-
-        List<String> messagesToSend = new ArrayList<>();
-
-        if (oldVersion) {
-            messagesToSend.add("Loading legacy libraries...");
-            Reader targetReader = new InputStreamReader(getResource("plugin.yml"));
-
-            YamlConfiguration pluginFile = YamlConfiguration.loadConfiguration(targetReader);
-            for (final String libraryPath : pluginFile.getStringList("legacy-libraries")) {
-                final Library library = Library.fromMavenRepo(libraryPath);
-                messagesToSend.add("Loading library " + libraryPath);
-                libraries.add(library);
-            }
-
-            for (final Library library : libraries)
-                library.load(Main.class.getClassLoader());
-            messagesToSend.add("Legacy libraries loaded!");
-        }
-        return messagesToSend;
+    public void setConfigGestion(ConfigGestion config) {
+        this.config = config;
     }
 
 }

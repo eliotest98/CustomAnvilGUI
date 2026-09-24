@@ -31,7 +31,7 @@ public class CustomAnvilGuiApi {
                         + "ItemStack to enchant:" + resultItem,
                 isDebugEnabled);
         Interface interface_ = Main.instance.getConfigGestion().getInterfaces().get("Anvil");
-        interface_.setCostOfEnchant(topInventory, levels);
+        interface_.setCostOfEnchant(topInventory, levels, null);
 
         NBTItem nbtItem = new NBTItem(resultItem);
         nbtItem.setInteger("ap.repairCost", levels);

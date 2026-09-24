@@ -22,6 +22,9 @@ public class ConfigGestion extends DefaultGestion {
     private final int percentageDamage;
     private final boolean directRename, onlyBedrock;
     private final PaymentConfig fixHandPayment, fixInventoryPayment;
+    private boolean virtualAnvilEnabled;
+    private final List<String> anvilAliases;
+    private final String commandAnvil;
 
     private final FileConfiguration file;
 
@@ -59,6 +62,10 @@ public class ConfigGestion extends DefaultGestion {
                 file.getString("Configuration.FixItems.Inventory.Payment.Calculation"),
                 messageNotEnoughMoney, messageNotEnoughMaterial,
                 messageNotEnoughExperience, vaultEnable, "cagui.fix.inventory.bypass");
+
+        virtualAnvilEnabled = file.getBoolean("Configuration.VirtualAnvil.Enabled");
+        anvilAliases = file.getStringList("Configuration.VirtualAnvil.Alias");
+        commandAnvil = file.getString("Configuration.VirtualAnvil.CommandAnvil");
 
         for (String nameInterface : file.getConfigurationSection("Interface").getKeys(false)) {
             String title = file.getString("Interface." + nameInterface + ".Title");
@@ -151,6 +158,23 @@ public class ConfigGestion extends DefaultGestion {
 
     public PaymentConfig getFixInventoryPayment() {
         return fixInventoryPayment;
+    }
+
+    public String getCommandAnvil() {
+        return commandAnvil;
+    }
+
+    public boolean isVirtualAnvilEnabled() {
+        return virtualAnvilEnabled;
+    }
+
+    public List<String> getAnvilAliases() {
+        return anvilAliases;
+    }
+
+    public void setVirtualAnvilEnabled(boolean virtualAnvilEnabled) {
+        this.virtualAnvilEnabled = virtualAnvilEnabled;
+        saveSection("Configuration.VirtualAnvil.Enabled", virtualAnvilEnabled);
     }
 
     @Override
